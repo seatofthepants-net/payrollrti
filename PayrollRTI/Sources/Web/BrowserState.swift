@@ -9,7 +9,15 @@ final class BrowserState: ObservableObject {
             guard webView !== oldValue else { return }
             loadingObservation = webView?.observe(\.isLoading, options: [.new]) { [weak self] webView, _ in
                 // Hop off the KVO callout so we never publish in the middle of a SwiftUI view update.
-                DispatchQueue.main.async { self?.isLoading = webView.isLoading }
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    self.isLoading = webView.isLoading
+                    if !webView.isLoading, self.isRestoring {
+                        self.isRestoring = false
+                        // Normally a fresh page has replaced the guarded one; if not, let the page work again.
+                        webView.evaluateJavaScript("window.payrollrtiRestoring = false")
+                    }
+                }
             }
         }
     }
@@ -17,15 +25,29 @@ final class BrowserState: ObservableObject {
     /// True while a page is loading, including form posts BPT takes a long time to answer (restoring a backup).
     @Published private(set) var isLoading = false
 
+    /// True from BPT's restore form being posted until that load ends. BPT answers only once the restore is done
+    /// (a minute or more), and anything that cancels the request part-way, such as a second click on Restore,
+    /// leaves a blank page, so we cover the page and ignore Reload, Back and Forward until then.
+    @Published var isRestoring = false
+
     private var loadingObservation: NSKeyValueObservation?
 
     var hasWebView: Bool { webView != nil }
 
-    func reload() { webView?.reload() }
+    func reload() {
+        guard !isRestoring else { return }
+        webView?.reload()
+    }
 
-    func goBack() { webView?.goBack() }
+    func goBack() {
+        guard !isRestoring else { return }
+        webView?.goBack()
+    }
 
-    func goForward() { webView?.goForward() }
+    func goForward() {
+        guard !isRestoring else { return }
+        webView?.goForward()
+    }
 
     func zoomIn() { webView.map { $0.pageZoom = min($0.pageZoom + 0.1, 3) } }
 

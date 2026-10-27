@@ -30,7 +30,10 @@ struct MainView: View {
             }
         case .running where openMode == .embedded:
             BPTWebView(url: server.baseURL, browser: browser)
-                .overlay(alignment: .top) { LoadingIndicator(isLoading: browser.isLoading) }
+                .overlay(alignment: .top) { LoadingIndicator(isLoading: browser.isLoading && !browser.isRestoring) }
+                .overlay {
+                    if browser.isRestoring { RestoringOverlay() }
+                }
         case .running:
             BrowserModeView()
         case .stopped:
@@ -71,6 +74,22 @@ struct LoadingIndicator: View {
             guard !Task.isCancelled else { return }
             withAnimation { isVisible = true }
         }
+    }
+}
+
+/// Covers BPT while it restores a backup, which it does inside the form post with no progress of its own. Also
+/// swallows clicks, since resubmitting or navigating away mid-restore is what left people on a blank page.
+struct RestoringOverlay: View {
+    var body: some View {
+        StatusPanel(symbol: nil, title: "Restoring your data…") {
+            Text(
+                "Basic PAYE Tools is replacing your payroll database with the backup. This can take a few minutes; "
+                    + "you'll be taken to the home screen when it's done. Please don't quit PayrollRTI.")
+        }
+        .background(.regularMaterial)
+        .contentShape(Rectangle())
+        .onTapGesture {}
+        .transition(.opacity)
     }
 }
 
