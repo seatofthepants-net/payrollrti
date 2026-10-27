@@ -42,6 +42,10 @@ struct BPTInstallation: Equatable {
 
     /// Returns the installation at `appURL` if its `rti` binary exists and is executable.
     static func locate(at appURL: URL = configuredAppURL, fileManager: FileManager = .default) -> BPTInstallation? {
+        #if DEBUG
+            // `-debugPretendBPTMissing YES`: show the not-installed screen with the real default path (screenshots).
+            if UserDefaults.standard.bool(forKey: "debugPretendBPTMissing") { return nil }
+        #endif
         let candidate = BPTInstallation(appURL: appURL)
         return fileManager.isExecutableFile(atPath: candidate.executableURL.path) ? candidate : nil
     }
