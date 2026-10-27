@@ -21,11 +21,13 @@ struct MainView: View {
         case .notInstalled:
             BPTNotFoundView()
         case .starting:
-            StatusPanel(symbol: nil, title: "Starting Basic PAYE Tools…") {
+            StatusPanel(symbol: nil, title: server.progress ?? "Starting Basic PAYE Tools…") {
                 Text("The first launch on an Apple silicon Mac can take a minute while Rosetta translates it.")
             }
         case .stopping:
-            StatusPanel(symbol: nil, title: "Stopping Basic PAYE Tools…") { EmptyView() }
+            StatusPanel(symbol: nil, title: server.progress ?? "Stopping Basic PAYE Tools…") {
+                Text("Please wait. Quitting part-way through could damage your payroll data.")
+            }
         case .running where openMode == .embedded:
             BPTWebView(url: server.baseURL, browser: browser)
         case .running:

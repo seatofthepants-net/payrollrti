@@ -26,12 +26,26 @@ final class ChildProcess {
     private var exitHandlers: [(Int32) -> Void] = []
 
     /// Spawns `executable` with stdin from /dev/null and stdout/stderr appended to `logURL`.
-    init(executable: URL, arguments: [String], workingDirectory: URL, logURL: URL) throws {
+    /// `environment` entries are added to (and override) this process's environment.
+    init(
+        executable: URL, arguments: [String], workingDirectory: URL, logURL: URL,
+        environment: [String: String] = [:]
+    ) throws {
         var attributes: posix_spawnattr_t?
         posix_spawnattr_init(&attributes)
         defer { posix_spawnattr_destroy(&attributes) }
-        posix_spawnattr_setflags(&attributes, Int16(POSIX_SPAWN_SETPGROUP | POSIX_SPAWN_CLOEXEC_DEFAULT))
+        posix_spawnattr_setflags(
+            &attributes,
+            Int16(POSIX_SPAWN_SETPGROUP | POSIX_SPAWN_CLOEXEC_DEFAULT | POSIX_SPAWN_SETSIGDEF | POSIX_SPAWN_SETSIGMASK))
         posix_spawnattr_setpgroup(&attributes, 0)
+        // The app ignores SIGTERM/SIGHUP/SIGINT so it can quit gracefully; ignored signals are inherited, so restore
+        // the defaults (and an empty mask) for the child or it would shrug off our SIGTERM.
+        var allSignals = sigset_t()
+        sigfillset(&allSignals)
+        posix_spawnattr_setsigdefault(&attributes, &allSignals)
+        var noSignals = sigset_t()
+        sigemptyset(&noSignals)
+        posix_spawnattr_setsigmask(&attributes, &noSignals)
 
         var actions: posix_spawn_file_actions_t?
         posix_spawn_file_actions_init(&actions)
@@ -43,9 +57,12 @@ final class ChildProcess {
 
         let argv: [UnsafeMutablePointer<CChar>?] = ([executable.path] + arguments).map { strdup($0) } + [nil]
         defer { argv.forEach { free($0) } }
+        let mergedEnvironment = ProcessInfo.processInfo.environment.merging(environment) { _, new in new }
+        let envp: [UnsafeMutablePointer<CChar>?] = mergedEnvironment.map { strdup("\($0.key)=\($0.value)") } + [nil]
+        defer { envp.forEach { free($0) } }
 
         var pid: pid_t = 0
-        let result = posix_spawn(&pid, executable.path, &actions, &attributes, argv, environ)
+        let result = posix_spawn(&pid, executable.path, &actions, &attributes, argv, envp)
         guard result == 0 else {
             throw result == EBADARCH ? SpawnError.rosettaMissing : SpawnError.failed(result)
         }
@@ -105,6 +122,16 @@ final class ChildProcess {
         signalGroup(SIGKILL)
         _ = await waitUntilGone(timeout: 2)
         return false
+    }
+
+    /// Waits for the process to exit on its own. Returns its exit status, or `nil` if it's still running at `timeout`.
+    func waitForExit(timeout: TimeInterval) async -> Int32? {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if let exitStatus { return exitStatus }
+            try? await Task.sleep(nanoseconds: 100_000_000)
+        }
+        return exitStatus
     }
 
     private func waitUntilGone(timeout: TimeInterval) async -> Bool {

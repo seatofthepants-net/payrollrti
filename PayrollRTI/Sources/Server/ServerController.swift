@@ -1,7 +1,13 @@
 import AppKit
 import Foundation
 
-/// Runs `rti runserver <port>` on the user's behalf: the same thing HMRC's Terminal workaround does by hand.
+/// Runs Basic PAYE Tools' server on the user's behalf. HMRC's Terminal workaround only runs `rti runserver <port>`,
+/// but BPT's own launcher wraps that in a lifecycle we mirror here:
+///
+/// 1. `rti startdb`: create the database on first run, apply migrations after a BPT upgrade, take a startup backup.
+/// 2. `rti updatecheck`: record whether HMRC have a newer release, for BPT's own in-app notice (best effort).
+/// 3. `rti runserver <port>`: the web UI.
+/// 4. `rti autobackup` after the server stops: the backup-on-exit the user configures in BPT's settings.
 @MainActor
 final class ServerController: ObservableObject {
     enum State: Equatable {
@@ -18,36 +24,55 @@ final class ServerController: ObservableObject {
     @Published private(set) var activePort: Int
     /// True when something was already serving on the port before we started (e.g. a Terminal session).
     @Published private(set) var isExternal = false
+    /// What's happening while starting or stopping, for display.
+    @Published private(set) var progress: String?
 
     let logURL: URL
+    /// BPT's user data folder, which holds `sqlite3.db`.
+    let dataDirectory: URL
     let startupTimeout: TimeInterval
     let terminationGrace: TimeInterval
+    /// How long `startdb` and `autobackup` may take. Migrations after an upgrade, under Rosetta, can be slow.
+    let maintenanceTimeout: TimeInterval
 
     private let locate: () -> BPTInstallation?
     private let portProvider: () -> Int
     private let probe: (URL) async -> Bool
     private var child: ChildProcess?
+    /// A one-shot `rti` command (startdb, updatecheck, autobackup) that's currently running.
+    private var helper: ChildProcess?
     private var startTask: Task<Void, Never>?
+
+    /// BPT's Python output is buffered without this, which scrambles the log. BPT's own launcher sets it too.
+    private static let childEnvironment = ["PYTHONUNBUFFERED": "1"]
 
     init(
         locate: @escaping () -> BPTInstallation? = { BPTInstallation.locate() },
         port: @escaping () -> Int = { AppSettings.port },
         startupTimeout: TimeInterval = 120,
         terminationGrace: TimeInterval = 5,
+        maintenanceTimeout: TimeInterval = 600,
         logURL: URL = ServerController.defaultLogURL,
+        dataDirectory: URL = ServerController.defaultDataDirectory,
         probe: @escaping (URL) async -> Bool = ServerController.httpProbe
     ) {
         self.locate = locate
         self.portProvider = port
         self.startupTimeout = startupTimeout
         self.terminationGrace = terminationGrace
+        self.maintenanceTimeout = maintenanceTimeout
         self.logURL = logURL
+        self.dataDirectory = dataDirectory
         self.probe = probe
         self.activePort = port()
     }
 
     nonisolated static let defaultLogURL = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent("Library/Logs/PayrollRTI/rti.log")
+
+    /// BPT's default user data folder (an `rti.cfg` can move it, in which case the empty-database repair is skipped).
+    nonisolated static let defaultDataDirectory = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent("HMRC/payetools-rti")
 
     // swiftlint:disable:next force_unwrapping
     var baseURL: URL { URL(string: "http://127.0.0.1:\(activePort)/")! }
@@ -64,7 +89,7 @@ final class ServerController: ObservableObject {
     var canStop: Bool { state == .starting || state == .running }
 
     /// Whether quitting needs to wait for `stop()`.
-    var ownsRunningProcess: Bool { child != nil }
+    var ownsRunningProcess: Bool { child != nil || helper != nil }
 
     /// Re-checks whether BPT is installed (e.g. after the user installs it while we're open).
     func refreshInstallation() {
@@ -92,15 +117,29 @@ final class ServerController: ObservableObject {
     func stop() async {
         startTask?.cancel()
         startTask = nil
+        if let helper {
+            // Never interrupt startdb: killing it mid-migration could leave the payroll database half-upgraded.
+            state = .stopping
+            progress = "Waiting for Basic PAYE Tools to finish updating its database…"
+            if await helper.waitForExit(timeout: maintenanceTimeout) == nil {
+                await helper.terminate(grace: terminationGrace)
+            }
+        }
         if let child {
             state = .stopping
+            progress = "Stopping Basic PAYE Tools…"
             await child.terminate(grace: terminationGrace)
             if self.child === child { self.child = nil }
+            if let installation {
+                progress = "Backing up payroll data…"
+                _ = try? await runMaintenance("autobackup", installation: installation)
+            }
         } else if isExternal, state == .running {
             state = .stopping
             await ExternalServer.stop(listeningOn: activePort, grace: terminationGrace)
         }
         isExternal = false
+        progress = nil
         state = locate() == nil ? .notInstalled : .stopped
     }
 
@@ -127,18 +166,47 @@ final class ServerController: ObservableObject {
             return
         }
 
-        let child: ChildProcess
         do {
-            try prepareLog(installation: installation, port: port)
-            child = try ChildProcess(
+            guard try await prepare(installation, port: port), !Task.isCancelled else { return }
+            progress = "Starting Basic PAYE Tools…"
+            appendLog("--- rti runserver \(port)")
+            let child = try ChildProcess(
                 executable: installation.executableURL,
                 arguments: ["runserver", String(port)],
                 workingDirectory: installation.workingDirectoryURL,
-                logURL: logURL)
+                logURL: logURL,
+                environment: Self.childEnvironment)
+            adopt(child)
+            await waitUntilServing(child, at: url)
         } catch {
             state = .failed(error.localizedDescription)
-            return
         }
+    }
+
+    /// Steps BPT's own launcher runs before the server. Returns false (having set a failure state) if BPT can't start.
+    private func prepare(_ installation: BPTInstallation, port: Int) async throws -> Bool {
+        try prepareLog(installation: installation, port: port)
+        moveEmptyDatabaseAside()
+
+        progress = "Preparing the payroll database…"
+        switch try await runMaintenance("startdb", installation: installation) {
+        case 0?:
+            break
+        case nil:
+            fail("Basic PAYE Tools took too long to prepare its database.")
+            return false
+        case let code?:
+            fail("Basic PAYE Tools couldn't prepare its database (exit code \(code)).")
+            return false
+        }
+        guard !Task.isCancelled else { return false }
+
+        progress = "Checking for Basic PAYE Tools updates…"
+        _ = try await runMaintenance("updatecheck", installation: installation, timeout: 30)
+        return true
+    }
+
+    private func adopt(_ child: ChildProcess) {
         self.child = child
         isExternal = false
         child.onExit { [weak self, weak child] code in
@@ -147,12 +215,17 @@ final class ServerController: ObservableObject {
                 self.childExited(child, code: code)
             }
         }
+    }
 
+    private func waitUntilServing(_ child: ChildProcess, at url: URL) async {
         let deadline = Date().addingTimeInterval(startupTimeout)
         while Date() < deadline {
             if Task.isCancelled || child.hasExited { return }
             if await probe(url) {
-                if state == .starting, self.child === child { state = .running }
+                if state == .starting, self.child === child {
+                    progress = nil
+                    state = .running
+                }
                 return
             }
             try? await Task.sleep(nanoseconds: 500_000_000)
@@ -161,7 +234,34 @@ final class ServerController: ObservableObject {
         state = .stopping
         await child.terminate(grace: terminationGrace)
         self.child = nil
-        state = .failed("Basic PAYE Tools didn't respond within \(Int(startupTimeout)) seconds.\n\n\(logTail())")
+        fail("Basic PAYE Tools didn't respond within \(Int(startupTimeout)) seconds.")
+    }
+
+    private func fail(_ message: String) {
+        progress = nil
+        state = .failed("\(message)\n\n\(logTail())")
+    }
+
+    /// Runs a one-shot `rti` management command to completion. Returns its exit code, or `nil` if it timed out.
+    private func runMaintenance(
+        _ command: String, installation: BPTInstallation, timeout: TimeInterval? = nil
+    ) async throws -> Int32? {
+        appendLog("--- rti \(command)")
+        let process = try ChildProcess(
+            executable: installation.executableURL,
+            arguments: [command],
+            workingDirectory: installation.workingDirectoryURL,
+            logURL: logURL,
+            environment: Self.childEnvironment)
+        helper = process
+        defer { if helper === process { helper = nil } }
+        if let code = await process.waitForExit(timeout: timeout ?? maintenanceTimeout) {
+            if code != 0 { appendLog("--- rti \(command) exited with code \(code)") }
+            return code
+        }
+        appendLog("--- rti \(command) timed out; stopping it")
+        await process.terminate(grace: terminationGrace)
+        return nil
     }
 
     private func childExited(_ exited: ChildProcess, code: Int32) {
@@ -169,53 +269,13 @@ final class ServerController: ObservableObject {
         child = nil
         startTask?.cancel()
         startTask = nil
-        if state == .starting || state == .running {
-            state = .failed("Basic PAYE Tools stopped unexpectedly (exit code \(code)).\n\n\(logTail())")
-        }
-    }
-
-    private func prepareLog(installation: BPTInstallation, port: Int) throws {
-        let fileManager = FileManager.default
-        try fileManager.createDirectory(at: logURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-        // Keep the log from growing forever: start fresh once it passes 5 MB.
-        if let size = try? fileManager.attributesOfItem(atPath: logURL.path)[.size] as? Int, size > 5_000_000 {
-            try? fileManager.removeItem(at: logURL)
-        }
-        if !fileManager.fileExists(atPath: logURL.path) {
-            fileManager.createFile(atPath: logURL.path, contents: nil)
-        }
-        let version = installation.version?.description ?? "unknown version"
-        let header = "\n=== \(Date()) starting \(installation.executableURL.path) runserver \(port) (\(version)) ===\n"
-        let handle = try FileHandle(forWritingTo: logURL)
-        defer { try? handle.close() }
-        try handle.seekToEnd()
-        try handle.write(contentsOf: Data(header.utf8))
-    }
-
-    /// The last few lines of the server log, for error messages.
-    func logTail(lines: Int = 8) -> String {
-        guard let text = try? String(contentsOf: logURL, encoding: .utf8) else { return "" }
-        return text.split(separator: "\n", omittingEmptySubsequences: true).suffix(lines).joined(separator: "\n")
-    }
-
-    private static func isBPTAppRunning(_ installation: BPTInstallation) -> Bool {
-        let bptPath = installation.appURL.standardizedFileURL.path
-        return NSWorkspace.shared.runningApplications.contains {
-            $0.bundleURL?.standardizedFileURL.path == bptPath
-        }
-    }
-
-    /// Any HTTP response at all means the server is up.
-    nonisolated static func httpProbe(_ url: URL) async -> Bool {
-        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 2)
-        request.httpMethod = "HEAD"
-        let session = URLSession(configuration: .ephemeral)
-        defer { session.finishTasksAndInvalidate() }
-        do {
-            let (_, response) = try await session.data(for: request)
-            return response is HTTPURLResponse
-        } catch {
-            return false
+        guard state == .starting || state == .running else { return }
+        if logTail(lines: 40).contains("That port is already in use") {
+            fail(
+                "Port \(activePort) is already in use by another program. Quit it, or choose a different port in "
+                    + "PayrollRTI Settings.")
+        } else {
+            fail("Basic PAYE Tools stopped unexpectedly (exit code \(code)).")
         }
     }
 }
