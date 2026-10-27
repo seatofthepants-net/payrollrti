@@ -49,10 +49,6 @@ PayrollRTI is an independent open-source project. It isn't made or endorsed by H
 ![PayrollRTI showing HMRC's Basic PAYE Tools home page](docs/screenshots/running.png)
 <sub>Basic PAYE Tools 26.1 running inside PayrollRTI on macOS 26.</sub>
 
-![PayrollRTI's banner when a newer Basic PAYE Tools is available](docs/screenshots/update-banner.png)
-<sub>When HMRC release a newer version, a banner links to the GOV.UK download page. Shown here with the stand-in BPT
-used for testing.</sub>
-
 ![PayrollRTI when Basic PAYE Tools isn't installed](docs/screenshots/not-installed.png)
 <sub>If Basic PAYE Tools isn't installed, PayrollRTI tells you where to get it.</sub>
 
