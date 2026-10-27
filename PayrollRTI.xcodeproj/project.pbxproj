@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		04EDB5738D1ECA302E1936F1 /* ServerControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D791699CA1C5982CA49CDDFC /* ServerControllerTests.swift */; };
 		1E42E30A10AE468523EE44DC /* BPTInstallationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */; };
+		218F9B52D9418F4D581C9ECB /* BPTWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A047646B0E4528476EB80C3C /* BPTWebView.swift */; };
+		27CD667327422905797A8476 /* BrowserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7D8100A93D74F44BCF5583 /* BrowserState.swift */; };
 		384497DF8C5833ED203AEF59 /* ServerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC0157A71D3F0B5CD863DEA /* ServerController.swift */; };
 		3BB1026CAA953271CF899EF0 /* BPTVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788FC7AB017826391B3E91AD /* BPTVersion.swift */; };
 		51F03A85E34603EF0531833B /* UpdateCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */; };
@@ -16,6 +18,7 @@
 		758B3187837E56B75C922682 /* BPTInstallation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD8F042E183096A54B5E936 /* BPTInstallation.swift */; };
 		7E046AC4B773821B5FB1D1AA /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A803E9554C109718E67A7573 /* UpdateChecker.swift */; };
 		8C13DFC625454F0C75726621 /* ChildProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7375712B887551FBFAC09F08 /* ChildProcess.swift */; };
+		8ECAC56BADFBEDC330F5C287 /* WebViewCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55BFCA6E8FA8B1A154ECF35 /* WebViewCoordinator.swift */; };
 		9B7A7CC1487CF870D6D4F44F /* ExternalServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE58F5B7E6E8836E7FE0B7DB /* ExternalServer.swift */; };
 		BE5D691B2F260C52C16BB2AB /* FakeBPT.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A338A8593261A6FDA1F43E /* FakeBPT.swift */; };
 		EBAE64ACB59CB09431080BF1 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D126CF5729F50C52E391907 /* AppSettings.swift */; };
@@ -38,12 +41,15 @@
 		2D126CF5729F50C52E391907 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		322E544675710DCD59107013 /* PayrollRTI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PayrollRTI.entitlements; sourceTree = "<group>"; };
 		42EA32C579F03EB7A8FA6F09 /* PayrollRTIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayrollRTIApp.swift; sourceTree = "<group>"; };
+		5B7D8100A93D74F44BCF5583 /* BrowserState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserState.swift; sourceTree = "<group>"; };
 		7375712B887551FBFAC09F08 /* ChildProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildProcess.swift; sourceTree = "<group>"; };
 		788FC7AB017826391B3E91AD /* BPTVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTVersion.swift; sourceTree = "<group>"; };
 		83F5C99A09B283C859CD7375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
 		9AC6ED1A69493A960CA81AB6 /* PayrollRTI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PayrollRTI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A047646B0E4528476EB80C3C /* BPTWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTWebView.swift; sourceTree = "<group>"; };
 		A803E9554C109718E67A7573 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
+		B55BFCA6E8FA8B1A154ECF35 /* WebViewCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewCoordinator.swift; sourceTree = "<group>"; };
 		C03C083BED45BBCCE425CC8A /* BPTVersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTVersionTests.swift; sourceTree = "<group>"; };
 		C1A338A8593261A6FDA1F43E /* FakeBPT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeBPT.swift; sourceTree = "<group>"; };
 		CDD8F042E183096A54B5E936 /* BPTInstallation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTInstallation.swift; sourceTree = "<group>"; };
@@ -53,12 +59,23 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		02D3F4228B1B85E37357141A /* Web */ = {
+			isa = PBXGroup;
+			children = (
+				A047646B0E4528476EB80C3C /* BPTWebView.swift */,
+				5B7D8100A93D74F44BCF5583 /* BrowserState.swift */,
+				B55BFCA6E8FA8B1A154ECF35 /* WebViewCoordinator.swift */,
+			);
+			path = Web;
+			sourceTree = "<group>";
+		};
 		3B9CC3172EB0158BC1440A6D /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 				42EA32C579F03EB7A8FA6F09 /* PayrollRTIApp.swift */,
 				9EE54CE5D3B40667DDE7934B /* Model */,
 				BAB2BF267BB49F993C30C692 /* Server */,
+				02D3F4228B1B85E37357141A /* Web */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -221,11 +238,14 @@
 				EBAE64ACB59CB09431080BF1 /* AppSettings.swift in Sources */,
 				758B3187837E56B75C922682 /* BPTInstallation.swift in Sources */,
 				3BB1026CAA953271CF899EF0 /* BPTVersion.swift in Sources */,
+				218F9B52D9418F4D581C9ECB /* BPTWebView.swift in Sources */,
+				27CD667327422905797A8476 /* BrowserState.swift in Sources */,
 				8C13DFC625454F0C75726621 /* ChildProcess.swift in Sources */,
 				9B7A7CC1487CF870D6D4F44F /* ExternalServer.swift in Sources */,
 				58434E8C94880A5C2E93633E /* PayrollRTIApp.swift in Sources */,
 				384497DF8C5833ED203AEF59 /* ServerController.swift in Sources */,
 				7E046AC4B773821B5FB1D1AA /* UpdateChecker.swift in Sources */,
+				8ECAC56BADFBEDC330F5C287 /* WebViewCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
