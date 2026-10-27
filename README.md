@@ -202,6 +202,14 @@ scripts/release.sh 0.1.0                 # Developer ID signed + notarised (need
 publishes a GitHub Release. The release includes the DMG, a SHA-256 checksum, and a changelog of commits since the
 previous tag.
 
+Every push to `main` (and a manual **Run workflow** on `main`) runs the same signed, notarised build as
+`0.0.0-main.<run number>`. It doesn't create a release; the DMG and checksum are kept as a workflow artifact for 30
+days. To fetch the latest one:
+
+```sh
+gh run download "$(gh run list --workflow release.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+```
+
 Some of this has to be done by hand once, by someone with the right Apple Developer role.
 
 ### 1. Create a Developer ID Application certificate
