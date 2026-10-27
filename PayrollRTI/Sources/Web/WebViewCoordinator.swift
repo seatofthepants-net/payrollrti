@@ -13,12 +13,45 @@ final class WebViewCoordinator: NSObject {
         injectionTime: .atDocumentStart,
         forMainFrameOnly: false)
 
+    /// BPT's "Restore your data" form posts back to this page.
+    static let restorePath = "/bptrti/restore"
+
+    /// Once the restore form is submitted, swallows further clicks and submissions on the page. A second click on
+    /// Restore makes WebKit drop the first request (BPT logs a broken pipe, though its restore carries on) and the
+    /// "restore in progress" reply to the second ends up as a blank page. This has to happen in the page: by the
+    /// time the navigation delegate hears about the second submission, the first has already been cancelled.
+    /// Cleared by `BrowserState` when the load ends; a new page starts afresh anyway.
+    static let restoreGuard = WKUserScript(
+        source: """
+            (function () {
+              var busy = function (e) {
+                if (window.payrollrtiRestoring) { e.preventDefault(); e.stopImmediatePropagation(); }
+              };
+              document.addEventListener('click', busy, true);
+              document.addEventListener('submit', busy, true);
+              window.addEventListener('submit', function (e) {
+                var form = e.target;
+                if (e.defaultPrevented || !form || (form.method || '').toLowerCase() !== 'post') { return; }
+                var path = new URL(form.action || location.href, location.href).pathname.replace(/\\/$/, '');
+                if (path === '\(restorePath)') { window.payrollrtiRestoring = true; }
+              });
+            })();
+            """,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: true)
+
     var home: URL
+    private weak var browser: BrowserState?
     private var popups: [NSWindow] = []
     private var downloadDestinations: [ObjectIdentifier: URL] = [:]
 
-    init(home: URL) {
+    init(home: URL, browser: BrowserState? = nil) {
         self.home = home
+        self.browser = browser
+    }
+
+    static func isRestoreSubmission(_ request: URLRequest) -> Bool {
+        request.httpMethod?.uppercased() == "POST" && request.url?.path == restorePath
     }
 
     func attach(_ webView: WKWebView) {
@@ -72,6 +105,11 @@ extension WebViewCoordinator: WKNavigationDelegate {
         if navigationAction.shouldPerformDownload {
             return decisionHandler(.download)
         }
+        if let browser, webView === browser.webView, Self.isRestoreSubmission(navigationAction.request) {
+            browser.isRestoring = true
+            // The overlay blocks the mouse; this stops Return or Space re-pressing the focused button.
+            webView.window?.makeFirstResponder(nil)
+        }
         if let url = navigationAction.request.url, !isLocal(url) {
             NSWorkspace.shared.open(url)
             return decisionHandler(.cancel)
@@ -90,6 +128,27 @@ extension WebViewCoordinator: WKNavigationDelegate {
             return decisionHandler(.download)
         }
         decisionHandler(.allow)
+    }
+
+    func webView(
+        _ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error
+    ) {
+        report(error, in: webView)
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        report(error, in: webView)
+    }
+
+    /// WKWebView otherwise leaves the old page up with no sign that anything went wrong (e.g. the server stopped
+    /// part-way through a form post).
+    private func report(_ error: Error, in webView: WKWebView) {
+        let error = error as NSError
+        // Superseded loads, and responses we turned into downloads, aren't failures.
+        if error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled { return }
+        if error.domain == "WebKitErrorDomain" && error.code == 102 { return }  // frame load interrupted by policy
+        let alert = NSAlert(error: error)
+        present(alert, for: webView) { _ in }
     }
 
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {

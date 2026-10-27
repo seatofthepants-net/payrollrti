@@ -7,12 +7,13 @@ struct BPTWebView: NSViewRepresentable {
     let browser: BrowserState
 
     func makeCoordinator() -> WebViewCoordinator {
-        WebViewCoordinator(home: url)
+        WebViewCoordinator(home: url, browser: browser)
     }
 
     func makeNSView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.addUserScript(WebViewCoordinator.printShim)
+        configuration.userContentController.addUserScript(WebViewCoordinator.restoreGuard)
         configuration.userContentController.add(context.coordinator, name: WebViewCoordinator.printMessage)
         configuration.preferences.isElementFullscreenEnabled = true
 

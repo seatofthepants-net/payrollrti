@@ -27,6 +27,7 @@
 		AB4A8743D4EE35C31EF44B1E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A4448CE7B236E63E693379B /* SettingsView.swift */; };
 		BE5D691B2F260C52C16BB2AB /* FakeBPT.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A338A8593261A6FDA1F43E /* FakeBPT.swift */; };
 		C19F9D521B64656F85E85173 /* DebugSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A74FB904B4E0D0A262FD261 /* DebugSnapshot.swift */; };
+		CB9DABD31116641209B40E81 /* WebViewCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245F1AF014E39A68B5EECC46 /* WebViewCoordinatorTests.swift */; };
 		E1C92AD92A29684F69B8D16D /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC02B6D2F1E56E18909E5F5D /* MainView.swift */; };
 		EBAE64ACB59CB09431080BF1 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D126CF5729F50C52E391907 /* AppSettings.swift */; };
 		EFBDFC04BCD6CB32C98786EE /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C47E44E459B04ED47BA175 /* AppCommands.swift */; };
@@ -48,6 +49,7 @@
 		09C7DA9CA3D35F5639114DAB /* StatusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenu.swift; sourceTree = "<group>"; };
 		0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTInstallationTests.swift; sourceTree = "<group>"; };
 		10031A9038A561DB579821C8 /* PayrollRTITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PayrollRTITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		245F1AF014E39A68B5EECC46 /* WebViewCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewCoordinatorTests.swift; sourceTree = "<group>"; };
 		2A4448CE7B236E63E693379B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2D126CF5729F50C52E391907 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		322E544675710DCD59107013 /* PayrollRTI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PayrollRTI.entitlements; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 				C1A338A8593261A6FDA1F43E /* FakeBPT.swift */,
 				D791699CA1C5982CA49CDDFC /* ServerControllerTests.swift */,
 				8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */,
+				245F1AF014E39A68B5EECC46 /* WebViewCoordinatorTests.swift */,
 			);
 			path = PayrollRTITests;
 			sourceTree = "<group>";
@@ -288,6 +291,7 @@
 				BE5D691B2F260C52C16BB2AB /* FakeBPT.swift in Sources */,
 				04EDB5738D1ECA302E1936F1 /* ServerControllerTests.swift in Sources */,
 				51F03A85E34603EF0531833B /* UpdateCheckerTests.swift in Sources */,
+				CB9DABD31116641209B40E81 /* WebViewCoordinatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

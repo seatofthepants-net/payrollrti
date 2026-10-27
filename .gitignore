@@ -8,3 +8,6 @@ xcuserdata/
 *.p12
 *.p8
 .swiftpm/
+
+# Local reproduction files (sample backups etc.)
+.scratch/

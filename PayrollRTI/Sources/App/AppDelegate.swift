@@ -43,6 +43,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard server.ownsRunningProcess else { return .terminateNow }
+        // Stopping the server mid-restore could leave BPT with its old database deleted and the new one half
+        // written.
+        if browser.isRestoring {
+            let alert = NSAlert()
+            alert.messageText = "A restore is in progress"
+            alert.informativeText =
+                "Basic PAYE Tools is still restoring your backup. Quit once it has finished and you're back "
+                + "on the home screen."
+            alert.runModal()
+            return .terminateCancel
+        }
         Task {
             await server.stop()
             sender.reply(toApplicationShouldTerminate: true)
