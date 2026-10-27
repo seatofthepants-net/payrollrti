@@ -9,12 +9,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let browser = BrowserState()
 
     private var cancellables: Set<AnyCancellable> = []
+    private var signalSources: [DispatchSourceSignal] = []
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Unit tests use the app as their host; don't start a real BPT server underneath them.
+        guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
+
         UserDefaults.standard.register(defaults: [
             SettingsKey.port: AppSettings.defaultPort,
             SettingsKey.openMode: OpenMode.embedded.rawValue,
         ])
+
+        handleTerminationSignals()
 
         server.$state
             .removeDuplicates()
@@ -42,6 +48,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             sender.reply(toApplicationShouldTerminate: true)
         }
         return .terminateLater
+    }
+
+    /// `kill`, logout scripts and Ctrl+C in Terminal send signals that would end the app without
+    /// `applicationShouldTerminate`, orphaning the rti server. Route them through a normal quit instead.
+    private func handleTerminationSignals() {
+        for signalNumber in [SIGTERM, SIGHUP, SIGINT] {
+            signal(signalNumber, SIG_IGN)
+            let source = DispatchSource.makeSignalSource(signal: signalNumber, queue: .main)
+            // Not NSApp.terminate directly: from inside a main-queue block, its wait for our async shutdown would
+            // deadlock, because that shutdown also needs the main queue. A run-loop perform runs outside the block.
+            source.setEventHandler {
+                RunLoop.main.perform(inModes: [.common]) { NSApp.terminate(nil) }
+            }
+            source.resume()
+            signalSources.append(source)
+        }
     }
 
     // MARK: - Actions shared by the menu bar, main menu and views
