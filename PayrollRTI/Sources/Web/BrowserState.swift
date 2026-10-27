@@ -4,7 +4,20 @@ import WebKit
 /// Lets menu commands reach whichever web view is currently showing BPT.
 @MainActor
 final class BrowserState: ObservableObject {
-    weak var webView: WKWebView?
+    weak var webView: WKWebView? {
+        didSet {
+            guard webView !== oldValue else { return }
+            loadingObservation = webView?.observe(\.isLoading, options: [.new]) { [weak self] webView, _ in
+                // Hop off the KVO callout so we never publish in the middle of a SwiftUI view update.
+                DispatchQueue.main.async { self?.isLoading = webView.isLoading }
+            }
+        }
+    }
+
+    /// True while a page is loading, including form posts BPT takes a long time to answer (restoring a backup).
+    @Published private(set) var isLoading = false
+
+    private var loadingObservation: NSKeyValueObservation?
 
     var hasWebView: Bool { webView != nil }
 

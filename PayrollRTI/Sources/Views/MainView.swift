@@ -30,12 +30,46 @@ struct MainView: View {
             }
         case .running where openMode == .embedded:
             BPTWebView(url: server.baseURL, browser: browser)
+                .overlay(alignment: .top) { LoadingIndicator(isLoading: browser.isLoading) }
         case .running:
             BrowserModeView()
         case .stopped:
             StoppedView()
         case .failed(let message):
             FailedView(message: message)
+        }
+    }
+}
+
+/// Shown over BPT when a page takes more than a moment. WKWebView has no loading UI of its own, and some BPT
+/// actions (restoring a backup takes about a minute) send nothing back until they finish, so without this a
+/// click looks like it did nothing.
+struct LoadingIndicator: View {
+    let isLoading: Bool
+    @State private var isVisible = false
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ProgressView().controlSize(.small)
+            Text("Working…")
+        }
+        .font(.callout)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 7)
+        .background(.regularMaterial, in: Capsule())
+        .shadow(radius: 3)
+        .padding(12)
+        .opacity(isVisible ? 1 : 0)
+        .allowsHitTesting(false)
+        .accessibilityHidden(!isVisible)
+        .task(id: isLoading) {
+            guard isLoading else {
+                withAnimation { isVisible = false }
+                return
+            }
+            try? await Task.sleep(nanoseconds: 700_000_000)
+            guard !Task.isCancelled else { return }
+            withAnimation { isVisible = true }
         }
     }
 }

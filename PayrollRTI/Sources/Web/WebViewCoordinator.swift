@@ -92,6 +92,27 @@ extension WebViewCoordinator: WKNavigationDelegate {
         decisionHandler(.allow)
     }
 
+    func webView(
+        _ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error
+    ) {
+        report(error, in: webView)
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        report(error, in: webView)
+    }
+
+    /// WKWebView otherwise leaves the old page up with no sign that anything went wrong (e.g. the server stopped
+    /// part-way through a form post).
+    private func report(_ error: Error, in webView: WKWebView) {
+        let error = error as NSError
+        // Superseded loads, and responses we turned into downloads, aren't failures.
+        if error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled { return }
+        if error.domain == "WebKitErrorDomain" && error.code == 102 { return }  // frame load interrupted by policy
+        let alert = NSAlert(error: error)
+        present(alert, for: webView) { _ in }
+    }
+
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
         download.delegate = self
     }
