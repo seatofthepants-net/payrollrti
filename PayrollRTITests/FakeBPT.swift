@@ -10,11 +10,23 @@ enum FakeBPT {
         case serve
         /// Serves HTTP but ignores SIGTERM, so only SIGKILL stops it.
         case ignoreTerm
-        /// Exits immediately with an error.
+        /// `runserver` exits immediately with an error.
         case crash
+        /// `startdb` fails, as it does when the database can't be opened.
+        case startdbFails
     }
 
-    static func make(version: String = "26.1.26134.173934", behaviour: Behaviour = .serve) throws -> BPTInstallation {
+    /// Commands the fake `rti` has been asked to run, in order (e.g. `["startdb", "updatecheck", "runserver 1234"]`).
+    static func calls(_ installation: BPTInstallation) -> [String] {
+        let log = installation.workingDirectoryURL.appendingPathComponent("calls.log")
+        let text = (try? String(contentsOf: log, encoding: .utf8)) ?? ""
+        return text.split(separator: "\n").map(String.init)
+    }
+
+    /// Mirrors real BPT: CFBundleShortVersionString is just "26.1"; CFBundleVersion has the full number.
+    static func make(
+        version: String = "26.1.26134.173934", shortVersion: String = "26.1", behaviour: Behaviour = .serve
+    ) throws -> BPTInstallation {
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("FakeBPT-\(UUID().uuidString)")
             .appendingPathComponent("Basic PAYE Tools.app")
@@ -22,17 +34,34 @@ enum FakeBPT {
         let macOS = installation.workingDirectoryURL
         try FileManager.default.createDirectory(at: macOS, withIntermediateDirectories: true)
 
-        let plist: NSDictionary = ["CFBundleShortVersionString": version, "CFBundleIdentifier": "test.fake.bpt"]
+        let plist: NSDictionary = [
+            "CFBundleShortVersionString": shortVersion, "CFBundleVersion": version,
+            "CFBundleIdentifier": "test.fake.bpt",
+        ]
         plist.write(to: root.appendingPathComponent("Contents/Info.plist"), atomically: true)
 
         let serve = "/usr/bin/python3 -m http.server \"$2\" --bind 127.0.0.1 --directory \"$(dirname \"$0\")\""
-        let body: String
+        let runserver: String
         switch behaviour {
-        case .serve: body = "\(serve) &\nwait"
-        case .ignoreTerm: body = "trap '' TERM\n\(serve) &\nwait"
-        case .crash: body = "echo 'fake rti: boom' >&2\nexit 3"
+        case .serve, .startdbFails: runserver = "\(serve) &\n  wait"
+        case .ignoreTerm: runserver = "trap '' TERM\n  \(serve) &\n  wait"
+        case .crash: runserver = "echo 'fake rti: boom' >&2\n  exit 3"
         }
-        let script = "#!/bin/sh\n\(body)\n"
+        let startdb =
+            behaviour == .startdbFails ? "echo 'CommandError: Failed to start up the database' >&2\n  exit 1" : "exit 0"
+        let script = """
+            #!/bin/sh
+            echo "$*" >> "$(dirname "$0")/calls.log"
+            case "$1" in
+            startdb)
+              \(startdb) ;;
+            updatecheck|autobackup)
+              exit 0 ;;
+            runserver)
+              \(runserver) ;;
+            esac
+
+            """
         try script.write(to: installation.executableURL, atomically: true, encoding: .utf8)
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: installation.executableURL.path)
         return installation

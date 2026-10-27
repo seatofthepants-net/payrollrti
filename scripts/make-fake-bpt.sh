@@ -17,7 +17,8 @@ cat > "$app/Contents/Info.plist" <<PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
   <key>CFBundleIdentifier</key><string>test.payrollrti.fake-bpt</string>
-  <key>CFBundleShortVersionString</key><string>$version</string>
+  <key>CFBundleShortVersionString</key><string>${version%%.*}.$(echo "$version" | cut -d. -f2)</string>
+  <key>CFBundleVersion</key><string>$version</string>
 </dict></plist>
 PLIST
 
@@ -49,11 +50,18 @@ HTML
 
 cat > "$macos/rti" <<'SH'
 #!/bin/sh
-# Mimics `rti runserver <port>`: forks a child server and waits, like Django's autoreloader does.
-[ "$1" = "runserver" ] || { echo "usage: rti runserver <port>" >&2; exit 2; }
-echo "Fake rti starting on 127.0.0.1:$2"
-/usr/bin/python3 -m http.server "$2" --bind 127.0.0.1 --directory "$(dirname "$0")" &
-wait
+# Mimics the rti commands BPT's launcher uses: startdb, updatecheck, runserver <port>, autobackup.
+case "$1" in
+  startdb) echo "Fake rti: Startup: Testing database integrity." ;;
+  updatecheck) echo "Fake rti: no updates recorded." ;;
+  autobackup) echo "Fake rti: Not performing an automatic backup." ;;
+  runserver)
+    # Forks a child server and waits, like Django's autoreloader does.
+    echo "Fake rti starting on 127.0.0.1:$2"
+    /usr/bin/python3 -m http.server "$2" --bind 127.0.0.1 --directory "$(dirname "$0")" &
+    wait ;;
+  *) echo "usage: rti startdb|updatecheck|runserver <port>|autobackup" >&2; exit 2 ;;
+esac
 SH
 chmod +x "$macos/rti"
 echo "$app"

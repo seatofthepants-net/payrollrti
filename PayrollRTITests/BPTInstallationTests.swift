@@ -14,10 +14,11 @@ final class BPTInstallationTests: XCTestCase {
         XCTAssertNil(BPTInstallation.locate(at: missing))
     }
 
-    func testLocateFindsInstallAndReadsVersion() throws {
-        let fake = try FakeBPT.make(version: "26.1.26134.173934")
+    func testLocateFindsInstallAndReadsFullVersion() throws {
+        // Real BPT: CFBundleShortVersionString "26.1", CFBundleVersion "26.1.26134.173934".
+        let fake = try FakeBPT.make(version: "26.1.26134.173934", shortVersion: "26.1")
         defer { FakeBPT.remove(fake) }
         let found = try XCTUnwrap(BPTInstallation.locate(at: fake.appURL))
-        XCTAssertEqual(found.version, BPTVersion("26.1.26134.173934"))
+        XCTAssertEqual(found.version?.description, "26.1.26134.173934")
     }
 }

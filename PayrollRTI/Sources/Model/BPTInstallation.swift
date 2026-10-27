@@ -13,6 +13,8 @@ struct BPTInstallation: Equatable {
     var workingDirectoryURL: URL { executableURL.deletingLastPathComponent() }
 
     /// The installed version, read from the outer bundle's Info.plist (falling back to the inner `rti.app`).
+    /// BPT puts only "26.1" in CFBundleShortVersionString and the full "26.1.26134.173934" (the number GOV.UK
+    /// publishes) in CFBundleVersion, so the most specific of the two wins.
     var version: BPTVersion? {
         let plists = [
             appURL.appendingPathComponent("Contents/Info.plist"),
@@ -20,10 +22,11 @@ struct BPTInstallation: Equatable {
         ]
         for plist in plists {
             guard let info = NSDictionary(contentsOf: plist) else { continue }
-            for key in ["CFBundleShortVersionString", "CFBundleVersion"] {
-                if let string = info[key] as? String, let version = BPTVersion(string) {
-                    return version
-                }
+            let versions = ["CFBundleVersion", "CFBundleShortVersionString"].compactMap {
+                (info[$0] as? String).flatMap(BPTVersion.init)
+            }
+            if let best = versions.max(by: { $0.components.count < $1.components.count }) {
+                return best
             }
         }
         return nil
