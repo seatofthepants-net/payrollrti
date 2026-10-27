@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#11734C"/>
+      <stop offset="1" stop-color="#043524"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="316" y1="0" x2="560" y2="0">
+      <stop offset="0" stop-color="#F2C86A"/>
+      <stop offset="1" stop-color="#D99A2B"/>
+    </linearGradient>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="glyphShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#00180F" flood-opacity="0.45"/>
+    </filter>
+    <clipPath id="squircle">
+      <rect x="100" y="100" width="824" height="824" rx="185"/>
+    </clipPath>
+  </defs>
+
+  <!-- Big Sur style rounded square on the standard 824pt grid -->
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="#000" filter="url(#shadow)"/>
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#bg)"/>
+  <g clip-path="url(#squircle)">
+    <rect x="100" y="100" width="824" height="824" fill="url(#sheen)"/>
+    <!-- "Play" motif: BPT starts with one click -->
+    <path d="M 392 286 L 392 738 L 784 512 Z" fill="#FFFFFF" fill-opacity="0.07"
+          stroke="#FFFFFF" stroke-opacity="0.07" stroke-width="90" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Monoline pound sign -->
+  <g filter="url(#glyphShadow)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 655 345 C 634 292 588 262 530 262 C 456 262 408 314 408 388 L 408 566
+             C 408 638 386 688 342 734 L 684 734"
+          stroke="#F7F3E8" stroke-width="74"/>
+    <path d="M 316 508 L 560 508" stroke="url(#gold)" stroke-width="66"/>
+  </g>
+</svg>

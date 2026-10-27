@@ -13,6 +13,7 @@
 		27CD667327422905797A8476 /* BrowserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7D8100A93D74F44BCF5583 /* BrowserState.swift */; };
 		384497DF8C5833ED203AEF59 /* ServerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC0157A71D3F0B5CD863DEA /* ServerController.swift */; };
 		3BB1026CAA953271CF899EF0 /* BPTVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788FC7AB017826391B3E91AD /* BPTVersion.swift */; };
+		41BA23F113BC84C5B37DABAA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04ED92349ABDEC4C788E1149 /* Assets.xcassets */; };
 		51F03A85E34603EF0531833B /* UpdateCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */; };
 		679DCD969529478E767F05AE /* StatusMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C7DA9CA3D35F5639114DAB /* StatusMenu.swift */; };
 		6BF86192995E7B1BB474C970 /* PayrollRTIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC9921F5F670FD94EE790E4 /* PayrollRTIApp.swift */; };
@@ -42,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		04ED92349ABDEC4C788E1149 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		09C7DA9CA3D35F5639114DAB /* StatusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenu.swift; sourceTree = "<group>"; };
 		0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTInstallationTests.swift; sourceTree = "<group>"; };
 		10031A9038A561DB579821C8 /* PayrollRTITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PayrollRTITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -152,9 +154,18 @@
 			children = (
 				83F5C99A09B283C859CD7375 /* Info.plist */,
 				322E544675710DCD59107013 /* PayrollRTI.entitlements */,
+				E4D48A5AA3D704A31B066952 /* Resources */,
 				3B9CC3172EB0158BC1440A6D /* Sources */,
 			);
 			path = PayrollRTI;
+			sourceTree = "<group>";
+		};
+		E4D48A5AA3D704A31B066952 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				04ED92349ABDEC4C788E1149 /* Assets.xcassets */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		E911A776E339BFDBBE340CB4 /* Products */ = {
@@ -183,6 +194,7 @@
 			buildConfigurationList = 5DAAA160B8470AAFE06D64D7 /* Build configuration list for PBXNativeTarget "PayrollRTI" */;
 			buildPhases = (
 				20F223A41495327417A5276A /* Sources */,
+				A8404FBD10F1389E8B6E0294 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -251,6 +263,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A8404FBD10F1389E8B6E0294 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				41BA23F113BC84C5B37DABAA /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		19DA411714312ED3710C9FBA /* Sources */ = {
