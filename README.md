@@ -27,7 +27,10 @@ payroll, is:
 
 PayrollRTI is a small native Mac app that does all of that for you:
 
-- Starts HMRC's `rti` server in the background when you open it.
+- Starts HMRC's `rti` server in the background when you open it. It runs the same steps as BPT's own launcher, which
+  the Terminal workaround skips:
+  - setting up BPT's database on first use, and updating it after you install a new version of BPT
+  - BPT's own backup when you quit
 - Shows Basic PAYE Tools in its own window as soon as the server is ready, or in your usual browser if you'd rather.
 - Stops the server cleanly when you quit: SIGTERM first, then SIGKILL if it hasn't exited within 5 seconds.
 - Puts a status light in the menu bar (🟢 running, 🔴 stopped) with Start, Stop, Open in Safari, Check for Updates and
@@ -43,10 +46,12 @@ PayrollRTI is an independent open-source project. It isn't made or endorsed by H
 
 ## Screenshots
 
-![PayrollRTI showing Basic PAYE Tools, with the update banner](docs/screenshots/running.png)
-<sub>The main window with the "newer version available" banner. Taken with the stand-in BPT used for testing
-(see [Testing without Basic PAYE Tools](#testing-without-basic-paye-tools)). With HMRC's software installed you'll
-see the real Basic PAYE Tools here.</sub>
+![PayrollRTI showing HMRC's Basic PAYE Tools home page](docs/screenshots/running.png)
+<sub>Basic PAYE Tools 26.1 running inside PayrollRTI on macOS 26.</sub>
+
+![PayrollRTI's banner when a newer Basic PAYE Tools is available](docs/screenshots/update-banner.png)
+<sub>When HMRC release a newer version, a banner links to the GOV.UK download page. Shown here with the stand-in BPT
+used for testing.</sub>
 
 ![PayrollRTI when Basic PAYE Tools isn't installed](docs/screenshots/not-installed.png)
 <sub>If Basic PAYE Tools isn't installed, PayrollRTI tells you where to get it.</sub>
@@ -99,11 +104,20 @@ page, plus a few that are specific to PayrollRTI.
 [GOV.UK](https://www.gov.uk/basic-paye-tools), then click **Check Again**. Don't uninstall an existing copy: HMRC
 warn you'll lose payroll data.
 
+**HMRC's Terminal workaround fails with `no such table: bptrti_settings`.** On a fresh install, the workaround's
+`./rti runserver 46729` runs before BPT has created its database. It then leaves an empty `sqlite3.db` in
+`~/HMRC/payetools-rti` that keeps tripping it up. PayrollRTI sets up the database first, as BPT's own launcher does. If
+it finds an empty `sqlite3.db` it renames it to `sqlite3.db.empty-<date>` (it never touches a database with data in
+it), and BPT then creates a proper one.
+
 **"The Basic PAYE Tools app is already open".** HMRC advise not to run the normal BPT app at the same time as the
 server. Quit it (look for the crown icon in the menu bar), then click **Try Again**.
 
 **"Basic PAYE Tools needs Rosetta".** On Apple silicon, open Terminal and run `softwareupdate --install-rosetta`,
 then try again.
+
+**"Port 46729 is already in use".** Another program is using the port. If it's a Terminal window running HMRC's
+workaround, press Ctrl+C there. Otherwise choose a different port in Settings.
 
 **It stopped unexpectedly, or didn't respond in time.** The error shows the last lines of the server's output. The
 full log is at `~/Library/Logs/PayrollRTI/rti.log` (**Server > Show Server Log**). Make sure nothing else is using the
@@ -126,7 +140,11 @@ and HMRC's [other service issues](https://www.gov.uk/government/collections/hm-r
 For anything else, contact the [online services helpdesk](https://www.gov.uk/hmrc-online-services-helpdesk).
 
 **Updating Basic PAYE Tools.** When a new version is out, PayrollRTI shows a banner with a link to GOV.UK. Quit
-PayrollRTI before running HMRC's installer so it can replace the running copy. Updates to PayrollRTI itself are
+PayrollRTI before running HMRC's installer so it can replace the running copy. The next time you open PayrollRTI,
+BPT updates its database before it starts, and the window says "Preparing the payroll database…" while that happens.
+
+**Backups.** When you quit, PayrollRTI runs BPT's own backup-on-exit, which follows the backup settings in BPT. Backups
+are saved in `~/HMRC/payetools-rti/backups/`. Updates to PayrollRTI itself are
 listed on the [Releases](https://github.com/seatofthepants-net/payrollrti/releases) page, which is linked from
 Settings.
 
