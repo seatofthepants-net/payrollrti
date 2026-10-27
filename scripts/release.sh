@@ -6,7 +6,8 @@
 #
 # Environment:
 #   SIGN=0                     build an unsigned (ad-hoc) DMG for testing; skips notarisation
-#   SIGNING_IDENTITY           defaults to "Developer ID Application" (team 632444ASFF)
+#   SIGNING_IDENTITY           defaults to "Developer ID Application" from the seatofthepants.net Ltd
+#                              Apple Developer account (Team ID 632444ASFF)
 #   NOTARY_KEY_PATH            path to the App Store Connect API key (.p8)
 #   NOTARY_KEY_ID              its key ID
 #   NOTARY_ISSUER_ID           its issuer ID
@@ -18,7 +19,7 @@ version="${1:?usage: $0 <version> [build-number]}"
 build_number="${2:-1}"
 sign="${SIGN:-1}"
 identity="${SIGNING_IDENTITY:-Developer ID Application}"
-team="632444ASFF"
+team="632444ASFF" # seatofthepants.net Ltd
 
 out="build/release"
 archive="$out/PayrollRTI.xcarchive"

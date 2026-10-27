@@ -59,8 +59,8 @@ see the real Basic PAYE Tools here.</sub>
 3. Open the DMG and drag **PayrollRTI** into **Applications**.
 4. Open PayrollRTI from Applications or Launchpad.
 
-Release builds are signed with an Apple Developer ID and notarised by Apple, so they open without Gatekeeper
-warnings. If you build PayrollRTI yourself, or use an unsigned test build, macOS may say it "can't be opened". In
+Release builds are signed under the seatofthepants.net Ltd Apple Developer account (Team ID 632444ASFF) and
+notarised by Apple, so they open without Gatekeeper warnings. If you build PayrollRTI yourself, or use an unsigned test build, macOS may say it "can't be opened". In
 that case, Control-click (or right-click) the app, choose **Open**, then confirm. On macOS 15 and later you may need
 **System Settings > Privacy & Security > Open Anyway** instead.
 
@@ -177,7 +177,8 @@ scripts/release.sh 0.1.0                 # Developer ID signed + notarised (need
 ## Release pipeline setup
 
 `.github/workflows/release.yml` runs on any `v*.*.*` tag. It builds a universal app, signs it with the
-**Developer ID Application** certificate for team `632444ASFF`, packages the DMG, notarises and staples it, and
+**Developer ID Application** certificate from the seatofthepants.net Ltd Apple Developer account
+(Team ID `632444ASFF`), packages the DMG, notarises and staples it, and
 publishes a GitHub Release. The release includes the DMG, a SHA-256 checksum, and a changelog of commits since the
 previous tag.
 
@@ -185,21 +186,23 @@ Some of this has to be done by hand once, by someone with the right Apple Develo
 
 ### 1. Create a Developer ID Application certificate
 
-This is a different certificate from the App Store "Apple Distribution" one. Only the **Account Holder** of the Apple
-Developer team can create Developer ID certificates.
+This is a different certificate from the App Store "Apple Distribution" one. Only the **Account Holder** of the
+seatofthepants.net Ltd Apple Developer account (Team ID 632444ASFF) can create Developer ID certificates.
 
-1. On a Mac signed in to the team in Xcode, go to **Xcode > Settings > Accounts**, select the team, then
+1. On a Mac signed in to that account in Xcode, go to **Xcode > Settings > Accounts**, select the
+   seatofthepants.net Ltd team, then
    **Manage Certificates… > + > Developer ID Application**. Alternatively, create it at
    [developer.apple.com > Certificates](https://developer.apple.com/account/resources/certificates/list) using a CSR
    from Keychain Access. Choose **Developer ID Application** and the G2 Sub-CA.
-2. In **Keychain Access > login > My Certificates**, find "Developer ID Application: … (632444ASFF)". Expand it to
+2. In **Keychain Access > login > My Certificates**, find "Developer ID Application: seatofthepants.net Ltd (632444ASFF)". Expand it to
    check the private key is there, select both, then **File > Export Items…** as a `.p12` with a strong password.
 
 ### 2. Create an App Store Connect API key for notarisation
 
 1. Go to [App Store Connect > Users and Access > Integrations > App Store Connect API](https://appstoreconnect.apple.com/access/integrations/api)
-   and open **Team Keys**. If the Norden Farm team already has a key with the **Developer** role or higher, you can
-   reuse it.
+   for the seatofthepants.net Ltd account and open **Team Keys**. If the account already has a key with the
+   **Developer** role or higher (for example one used to notarise other apps signed under Team ID 632444ASFF), you
+   can reuse it.
 2. Otherwise click **+**, name the key (for example "PayrollRTI notarisation"), give it the **Developer** role and
    generate it.
 3. Note the **Key ID** and the **Issuer ID** shown above the table, and download `AuthKey_XXXXXXXXXX.p8`. You can only
