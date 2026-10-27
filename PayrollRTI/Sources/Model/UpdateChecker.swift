@@ -38,7 +38,8 @@ final class UpdateChecker: ObservableObject {
                 return
             }
             if let installed {
-                status = installed < latest ? .updateAvailable(installed: installed, latest: latest) : .upToDate(installed)
+                status =
+                    installed < latest ? .updateAvailable(installed: installed, latest: latest) : .upToDate(installed)
             } else {
                 status = .latestKnown(latest)
             }
@@ -74,6 +75,6 @@ final class UpdateChecker: ObservableObject {
         if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
             throw URLError(.badServerResponse)
         }
-        return String(decoding: data, as: UTF8.self)
+        return String(bytes: data, encoding: .utf8) ?? ""
     }
 }

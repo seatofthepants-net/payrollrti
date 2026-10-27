@@ -36,10 +36,11 @@ final class UpdateCheckerTests: XCTestCase {
         XCTAssertFalse(checker.showsBanner)
     }
 
-    func testReportsUpToDate() async {
+    func testReportsUpToDate() async throws {
+        let installed = try XCTUnwrap(BPTVersion("26.1.26134.173934"))
         let checker = UpdateChecker(fetchPage: { self.govUKPage })
-        await checker.check(installed: BPTVersion("26.1.26134.173934"))
-        XCTAssertEqual(checker.status, .upToDate(BPTVersion("26.1.26134.173934")!))
+        await checker.check(installed: installed)
+        XCTAssertEqual(checker.status, .upToDate(installed))
         XCTAssertFalse(checker.showsBanner)
     }
 

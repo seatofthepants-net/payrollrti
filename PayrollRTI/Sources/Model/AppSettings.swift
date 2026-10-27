@@ -37,13 +37,12 @@ enum AppSettings {
 }
 
 enum Links {
-    // swiftlint:disable force_unwrapping
     static let bptDownload = URL(string: "https://www.gov.uk/basic-paye-tools")!
     static let hmrcIssues = URL(
         string:
+            // swiftlint:disable:next line_length
             "https://www.gov.uk/government/publications/basic-paye-tools-service-availability-and-issues/basic-paye-service-availability-and-issues"
     )!
     static let releases = URL(string: "https://github.com/seatofthepants-net/payrollrti/releases")!
     static let repository = URL(string: "https://github.com/seatofthepants-net/payrollrti")!
-    // swiftlint:enable force_unwrapping
 }

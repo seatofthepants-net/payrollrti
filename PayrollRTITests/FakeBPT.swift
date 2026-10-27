@@ -44,8 +44,8 @@ enum FakeBPT {
 
     /// Asks the kernel for an unused TCP port.
     static func freePort() -> Int {
-        let fd = socket(AF_INET, SOCK_STREAM, 0)
-        defer { close(fd) }
+        let sock = socket(AF_INET, SOCK_STREAM, 0)
+        defer { close(sock) }
         var addr = sockaddr_in()
         addr.sin_family = sa_family_t(AF_INET)
         addr.sin_addr.s_addr = inet_addr("127.0.0.1")
@@ -53,8 +53,8 @@ enum FakeBPT {
         var length = socklen_t(MemoryLayout<sockaddr_in>.size)
         withUnsafeMutablePointer(to: &addr) {
             $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-                _ = bind(fd, $0, length)
-                _ = getsockname(fd, $0, &length)
+                _ = bind(sock, $0, length)
+                _ = getsockname(sock, $0, &length)
             }
         }
         return Int(UInt16(bigEndian: addr.sin_port))

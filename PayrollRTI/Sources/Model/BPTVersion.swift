@@ -5,7 +5,8 @@ struct BPTVersion: Comparable, CustomStringConvertible, Hashable {
     let components: [Int]
 
     init?(_ string: String) {
-        let parts = string.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: ".", omittingEmptySubsequences: false)
+        let parts = string.trimmingCharacters(in: .whitespacesAndNewlines).split(
+            separator: ".", omittingEmptySubsequences: false)
         guard !parts.isEmpty else { return nil }
         var components: [Int] = []
         for part in parts {

@@ -32,7 +32,7 @@ enum ExternalServer {
                 }
                 let data = pipe.fileHandleForReading.readDataToEndOfFile()
                 process.waitUntilExit()
-                let pids = String(decoding: data, as: UTF8.self).split(separator: "\n").compactMap { pid_t($0) }
+                let pids = (String(bytes: data, encoding: .utf8) ?? "").split(separator: "\n").compactMap { pid_t($0) }
                 continuation.resume(returning: pids)
             }
         }

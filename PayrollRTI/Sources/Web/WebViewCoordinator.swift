@@ -44,7 +44,9 @@ final class WebViewCoordinator: NSObject {
         }
     }
 
-    private func present(_ alert: NSAlert, for webView: WKWebView, completion: @escaping (NSApplication.ModalResponse) -> Void) {
+    private func present(
+        _ alert: NSAlert, for webView: WKWebView, completion: @escaping (NSApplication.ModalResponse) -> Void
+    ) {
         if let window = webView.window {
             alert.beginSheetModal(for: window, completionHandler: completion)
         } else {
@@ -81,7 +83,8 @@ extension WebViewCoordinator: WKNavigationDelegate {
         _ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
         decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
     ) {
-        let disposition = (navigationResponse.response as? HTTPURLResponse)?
+        let disposition =
+            (navigationResponse.response as? HTTPURLResponse)?
             .value(forHTTPHeaderField: "Content-Disposition")?.lowercased() ?? ""
         if !navigationResponse.canShowMIMEType || disposition.hasPrefix("attachment") {
             return decisionHandler(.download)
