@@ -71,7 +71,7 @@ for mode in light dark; do
   until ls "$work/$mode-missing/" 2>/dev/null | grep -q not-installed; do sleep 1; done
   sleep 1
   quit_app
-  cp "$work/$mode-missing/"*-not-installed.png "$out/not-installed-$mode.png"
+  cp "$work/$mode-missing/"*-not-installed.png "$out/bpt-not-installed-$mode.png"
 done
 
 pgrep -x rti >/dev/null && echo "warning: an rti process is still running" >&2
