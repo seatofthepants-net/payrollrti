@@ -39,6 +39,11 @@ PayrollRTI is a small native Mac app that does all of that for you:
 - Handles what BPT needs from a browser: confirmation dialogs, file pickers, downloads, and Print (use **PDF > Save as
   PDF** in the print sheet, as HMRC recommend for P45s, P60s and payslips).
 
+**If BPT won't open on your Mac**, PayrollRTI is how you run it without using Terminal. **If BPT still opens normally**
+(for example on macOS 14 Sonoma), PayrollRTI is a convenience rather than a fix. You get BPT one click away in the menu
+bar, the option to start it at login, alerts when HMRC release a new version, and a clean shutdown with BPT's backup
+on exit.
+
 It doesn't modify, bundle or redistribute HMRC's software. You install Basic PAYE Tools from GOV.UK as normal, and
 PayrollRTI runs the copy in your Applications folder. Your payroll data stays where BPT has always kept it.
 
@@ -48,10 +53,6 @@ PayrollRTI is an independent open-source project. It isn't made or endorsed by H
 
 ![PayrollRTI showing HMRC's Basic PAYE Tools home page](docs/screenshots/running.png)
 <sub>Basic PAYE Tools 26.1 running inside PayrollRTI on macOS 26.</sub>
-
-![PayrollRTI's banner when a newer Basic PAYE Tools is available](docs/screenshots/update-banner.png)
-<sub>When HMRC release a newer version, a banner links to the GOV.UK download page. Shown here with the stand-in BPT
-used for testing.</sub>
 
 ![PayrollRTI when Basic PAYE Tools isn't installed](docs/screenshots/not-installed.png)
 <sub>If Basic PAYE Tools isn't installed, PayrollRTI tells you where to get it.</sub>
@@ -71,7 +72,8 @@ that case, Control-click (or right-click) the app, choose **Open**, then confirm
 
 ### Requirements
 
-- macOS 14 Sonoma or later. It's mainly for Sequoia, Tahoe and Golden Gate, where BPT is broken.
+- macOS 14 Sonoma or later. HMRC list macOS 15 Sequoia, 26 Tahoe and 27 Golden Gate as affected, and on those it
+  replaces their Terminal workaround. Where BPT opens normally, it's a convenience wrapper.
 - Intel or Apple silicon. PayrollRTI is a universal app. Basic PAYE Tools is Intel-only, so on Apple silicon it runs
   under Rosetta. If Rosetta isn't installed, PayrollRTI tells you how to install it:
   `softwareupdate --install-rosetta`.
