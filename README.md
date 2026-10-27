@@ -5,8 +5,7 @@
 <h1 align="center">PayrollRTI</h1>
 
 <p align="center">
-  Run HMRC's Basic PAYE Tools on macOS 27 Golden Gate without the Terminal workaround, and from your menu bar on
-  earlier versions of macOS.
+  Run HMRC's Basic PAYE Tools on macOS Sequoia, Tahoe and Golden Gate without the Terminal workaround.
 </p>
 
 ---
@@ -14,9 +13,9 @@
 ## The problem
 
 HMRC's free payroll software, [Basic PAYE Tools](https://www.gov.uk/basic-paye-tools) (BPT), doesn't open on
-macOS 27 Golden Gate. Earlier versions of macOS aren't affected: BPT opens normally on them. HMRC's
-[service availability and issues](https://www.gov.uk/government/publications/basic-paye-tools-service-availability-and-issues/basic-paye-service-availability-and-issues)
-page gives a Terminal workaround, which you have to repeat every time you run payroll:
+recent versions of macOS. HMRC [acknowledge the issue](https://www.gov.uk/government/publications/basic-paye-tools-service-availability-and-issues/basic-paye-service-availability-and-issues)
+for macOS 15 Sequoia, 26 Tahoe and 27 Golden Gate. Their workaround, which you have to repeat every time you run
+payroll, is:
 
 1. Open Terminal.
 2. `cd "/Applications/Basic PAYE Tools.app/Contents/Helpers/rti.app/Contents/MacOS"`
@@ -40,10 +39,10 @@ PayrollRTI is a small native Mac app that does all of that for you:
 - Handles what BPT needs from a browser: confirmation dialogs, file pickers, downloads, and Print (use **PDF > Save as
   PDF** in the print sheet, as HMRC recommend for P45s, P60s and payslips).
 
-**On macOS 27 Golden Gate**, PayrollRTI is how you run Basic PAYE Tools without using Terminal.
-**On macOS 14 to 26**, BPT already opens normally, so PayrollRTI is a convenience rather than a fix. You get BPT one
-click away in the menu bar, the option to start it at login, alerts when HMRC release a new version, and a clean
-shutdown with BPT's backup on exit.
+**If BPT won't open on your Mac**, PayrollRTI is how you run it without using Terminal. **If BPT still opens normally**
+(for example on macOS 14 Sonoma), PayrollRTI is a convenience rather than a fix. You get BPT one click away in the menu
+bar, the option to start it at login, alerts when HMRC release a new version, and a clean shutdown with BPT's backup
+on exit.
 
 It doesn't modify, bundle or redistribute HMRC's software. You install Basic PAYE Tools from GOV.UK as normal, and
 PayrollRTI runs the copy in your Applications folder. Your payroll data stays where BPT has always kept it.
@@ -73,8 +72,8 @@ that case, Control-click (or right-click) the app, choose **Open**, then confirm
 
 ### Requirements
 
-- macOS 14 Sonoma or later. On macOS 27 Golden Gate it replaces HMRC's Terminal workaround. On macOS 14 to 26, where
-  BPT opens normally, it's a convenience wrapper.
+- macOS 14 Sonoma or later. HMRC list macOS 15 Sequoia, 26 Tahoe and 27 Golden Gate as affected, and on those it
+  replaces their Terminal workaround. Where BPT opens normally, it's a convenience wrapper.
 - Intel or Apple silicon. PayrollRTI is a universal app. Basic PAYE Tools is Intel-only, so on Apple silicon it runs
   under Rosetta. If Rosetta isn't installed, PayrollRTI tells you how to install it:
   `softwareupdate --install-rosetta`.
