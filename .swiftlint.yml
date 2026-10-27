@@ -1,0 +1,18 @@
+included:
+  - PayrollRTI
+  - PayrollRTITests
+line_length:
+  warning: 120
+  error: 160
+identifier_name:
+  excluded: [id, ok, to, pid]
+trailing_comma:
+  mandatory_comma: true
+opt_in_rules:
+  - empty_count
+  - closure_spacing
+  - force_unwrapping
+force_unwrapping:
+  severity: warning
+disabled_rules:
+  - opening_brace

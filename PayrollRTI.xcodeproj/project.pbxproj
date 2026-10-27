@@ -1,0 +1,413 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		58434E8C94880A5C2E93633E /* PayrollRTIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA32C579F03EB7A8FA6F09 /* PayrollRTIApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9F683B363B544EC677FD192E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E6BE8ED4ED97CFC16DE8A8A7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 742C9AAFA8D4B14D11AA2677;
+			remoteInfo = PayrollRTI;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		10031A9038A561DB579821C8 /* PayrollRTITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PayrollRTITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		322E544675710DCD59107013 /* PayrollRTI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PayrollRTI.entitlements; sourceTree = "<group>"; };
+		42EA32C579F03EB7A8FA6F09 /* PayrollRTIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayrollRTIApp.swift; sourceTree = "<group>"; };
+		83F5C99A09B283C859CD7375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9AC6ED1A69493A960CA81AB6 /* PayrollRTI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PayrollRTI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		3B9CC3172EB0158BC1440A6D /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				42EA32C579F03EB7A8FA6F09 /* PayrollRTIApp.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		838AC38E4C17C713DC3B5CFA /* PayrollRTITests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = PayrollRTITests;
+			sourceTree = "<group>";
+		};
+		E0726CE3DA3C76CB4B8E3DB1 /* PayrollRTI */ = {
+			isa = PBXGroup;
+			children = (
+				83F5C99A09B283C859CD7375 /* Info.plist */,
+				322E544675710DCD59107013 /* PayrollRTI.entitlements */,
+				3B9CC3172EB0158BC1440A6D /* Sources */,
+			);
+			path = PayrollRTI;
+			sourceTree = "<group>";
+		};
+		E911A776E339BFDBBE340CB4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9AC6ED1A69493A960CA81AB6 /* PayrollRTI.app */,
+				10031A9038A561DB579821C8 /* PayrollRTITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F61CD7FA09E3E2630DBAB7B6 = {
+			isa = PBXGroup;
+			children = (
+				E0726CE3DA3C76CB4B8E3DB1 /* PayrollRTI */,
+				838AC38E4C17C713DC3B5CFA /* PayrollRTITests */,
+				E911A776E339BFDBBE340CB4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		742C9AAFA8D4B14D11AA2677 /* PayrollRTI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5DAAA160B8470AAFE06D64D7 /* Build configuration list for PBXNativeTarget "PayrollRTI" */;
+			buildPhases = (
+				20F223A41495327417A5276A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PayrollRTI;
+			packageProductDependencies = (
+			);
+			productName = PayrollRTI;
+			productReference = 9AC6ED1A69493A960CA81AB6 /* PayrollRTI.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AD525427A7DAF2F9803E1FCC /* PayrollRTITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0D2DD0D3CEA1975B8D46973D /* Build configuration list for PBXNativeTarget "PayrollRTITests" */;
+			buildPhases = (
+				19DA411714312ED3710C9FBA /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C1CD72D1657AB259A6C65BD7 /* PBXTargetDependency */,
+			);
+			name = PayrollRTITests;
+			packageProductDependencies = (
+			);
+			productName = PayrollRTITests;
+			productReference = 10031A9038A561DB579821C8 /* PayrollRTITests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E6BE8ED4ED97CFC16DE8A8A7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					742C9AAFA8D4B14D11AA2677 = {
+						DevelopmentTeam = 632444ASFF;
+						ProvisioningStyle = Manual;
+					};
+					AD525427A7DAF2F9803E1FCC = {
+						DevelopmentTeam = 632444ASFF;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = D55182E484059FB3027BD5E3 /* Build configuration list for PBXProject "PayrollRTI" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F61CD7FA09E3E2630DBAB7B6;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = E911A776E339BFDBBE340CB4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				742C9AAFA8D4B14D11AA2677 /* PayrollRTI */,
+				AD525427A7DAF2F9803E1FCC /* PayrollRTITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		19DA411714312ED3710C9FBA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		20F223A41495327417A5276A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				58434E8C94880A5C2E93633E /* PayrollRTIApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C1CD72D1657AB259A6C65BD7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 742C9AAFA8D4B14D11AA2677 /* PayrollRTI */;
+			targetProxy = 9F683B363B544EC677FD192E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		11781E6A80DBD5831411E602 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 632444ASFF;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A6D20598D18C0DF36881CAB9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = net.seatofthepants.payrollrti.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PayrollRTI.app/Contents/MacOS/PayrollRTI";
+			};
+			name = Debug;
+		};
+		C89C171E907B3D7B8C4CB450 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PayrollRTI/PayrollRTI.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = PayrollRTI/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = net.seatofthepants.payrollrti;
+				PRODUCT_NAME = PayrollRTI;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		C99B2B5DABB91915E403B7CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PayrollRTI/PayrollRTI.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = PayrollRTI/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = net.seatofthepants.payrollrti;
+				PRODUCT_NAME = PayrollRTI;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		CA1A364B4198D55CCA51D92C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = net.seatofthepants.payrollrti.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PayrollRTI.app/Contents/MacOS/PayrollRTI";
+			};
+			name = Release;
+		};
+		FC0E3A55DD95ED2CB72BCE1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 632444ASFF;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0D2DD0D3CEA1975B8D46973D /* Build configuration list for PBXNativeTarget "PayrollRTITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A6D20598D18C0DF36881CAB9 /* Debug */,
+				CA1A364B4198D55CCA51D92C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5DAAA160B8470AAFE06D64D7 /* Build configuration list for PBXNativeTarget "PayrollRTI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C89C171E907B3D7B8C4CB450 /* Debug */,
+				C99B2B5DABB91915E403B7CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D55182E484059FB3027BD5E3 /* Build configuration list for PBXProject "PayrollRTI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC0E3A55DD95ED2CB72BCE1F /* Debug */,
+				11781E6A80DBD5831411E602 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E6BE8ED4ED97CFC16DE8A8A7 /* Project object */;
+}

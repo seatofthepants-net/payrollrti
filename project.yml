@@ -1,0 +1,59 @@
+name: PayrollRTI
+options:
+  bundleIdPrefix: net.seatofthepants
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    DEVELOPMENT_TEAM: 632444ASFF
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    # Debug and CI builds are ad-hoc signed; the release workflow overrides
+    # these with the Developer ID Application identity.
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+targets:
+  PayrollRTI:
+    type: application
+    platform: macOS
+    sources:
+      - PayrollRTI
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: net.seatofthepants.payrollrti
+        PRODUCT_NAME: PayrollRTI
+        INFOPLIST_FILE: PayrollRTI/Info.plist
+        CODE_SIGN_ENTITLEMENTS: PayrollRTI/PayrollRTI.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_HARDENED_RUNTIME: NO
+        COMBINE_HIDPI_IMAGES: YES
+      configs:
+        Release:
+          ENABLE_HARDENED_RUNTIME: YES
+          ARCHS: "$(ARCHS_STANDARD)"
+          ONLY_ACTIVE_ARCH: NO
+  PayrollRTITests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - PayrollRTITests
+    dependencies:
+      - target: PayrollRTI
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: net.seatofthepants.payrollrti.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/PayrollRTI.app/Contents/MacOS/PayrollRTI"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+schemes:
+  PayrollRTI:
+    build:
+      targets:
+        PayrollRTI: all
+        PayrollRTITests: [test]
+    test:
+      targets:
+        - PayrollRTITests
