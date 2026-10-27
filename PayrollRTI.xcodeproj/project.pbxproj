@@ -11,8 +11,10 @@
 		1E42E30A10AE468523EE44DC /* BPTInstallationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */; };
 		384497DF8C5833ED203AEF59 /* ServerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC0157A71D3F0B5CD863DEA /* ServerController.swift */; };
 		3BB1026CAA953271CF899EF0 /* BPTVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788FC7AB017826391B3E91AD /* BPTVersion.swift */; };
+		51F03A85E34603EF0531833B /* UpdateCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */; };
 		58434E8C94880A5C2E93633E /* PayrollRTIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA32C579F03EB7A8FA6F09 /* PayrollRTIApp.swift */; };
 		758B3187837E56B75C922682 /* BPTInstallation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD8F042E183096A54B5E936 /* BPTInstallation.swift */; };
+		7E046AC4B773821B5FB1D1AA /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A803E9554C109718E67A7573 /* UpdateChecker.swift */; };
 		8C13DFC625454F0C75726621 /* ChildProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7375712B887551FBFAC09F08 /* ChildProcess.swift */; };
 		9B7A7CC1487CF870D6D4F44F /* ExternalServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE58F5B7E6E8836E7FE0B7DB /* ExternalServer.swift */; };
 		BE5D691B2F260C52C16BB2AB /* FakeBPT.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A338A8593261A6FDA1F43E /* FakeBPT.swift */; };
@@ -39,7 +41,9 @@
 		7375712B887551FBFAC09F08 /* ChildProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildProcess.swift; sourceTree = "<group>"; };
 		788FC7AB017826391B3E91AD /* BPTVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTVersion.swift; sourceTree = "<group>"; };
 		83F5C99A09B283C859CD7375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
 		9AC6ED1A69493A960CA81AB6 /* PayrollRTI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PayrollRTI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A803E9554C109718E67A7573 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		C03C083BED45BBCCE425CC8A /* BPTVersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTVersionTests.swift; sourceTree = "<group>"; };
 		C1A338A8593261A6FDA1F43E /* FakeBPT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeBPT.swift; sourceTree = "<group>"; };
 		CDD8F042E183096A54B5E936 /* BPTInstallation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTInstallation.swift; sourceTree = "<group>"; };
@@ -66,6 +70,7 @@
 				C03C083BED45BBCCE425CC8A /* BPTVersionTests.swift */,
 				C1A338A8593261A6FDA1F43E /* FakeBPT.swift */,
 				D791699CA1C5982CA49CDDFC /* ServerControllerTests.swift */,
+				8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */,
 			);
 			path = PayrollRTITests;
 			sourceTree = "<group>";
@@ -76,6 +81,7 @@
 				2D126CF5729F50C52E391907 /* AppSettings.swift */,
 				CDD8F042E183096A54B5E936 /* BPTInstallation.swift */,
 				788FC7AB017826391B3E91AD /* BPTVersion.swift */,
+				A803E9554C109718E67A7573 /* UpdateChecker.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -204,6 +210,7 @@
 				F40130152EF3AB139D109354 /* BPTVersionTests.swift in Sources */,
 				BE5D691B2F260C52C16BB2AB /* FakeBPT.swift in Sources */,
 				04EDB5738D1ECA302E1936F1 /* ServerControllerTests.swift in Sources */,
+				51F03A85E34603EF0531833B /* UpdateCheckerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,6 +225,7 @@
 				9B7A7CC1487CF870D6D4F44F /* ExternalServer.swift in Sources */,
 				58434E8C94880A5C2E93633E /* PayrollRTIApp.swift in Sources */,
 				384497DF8C5833ED203AEF59 /* ServerController.swift in Sources */,
+				7E046AC4B773821B5FB1D1AA /* UpdateChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
