@@ -1,11 +1,22 @@
 name: Release
 
-# Tags publish a GitHub release. Pushes to main (merged PRs) and manual runs build the same signed,
-# notarised DMG and keep it as a workflow artifact for testing.
+# Tags publish a GitHub release. Pushes to main (merged PRs) that change the app, and manual runs, build the same
+# signed, notarised DMG and keep it as a workflow artifact for testing. GitHub doesn't apply path filters to tag
+# pushes, so tagged releases always build.
 on:
   push:
     tags: ["v*.*.*"]
     branches: [main]
+    paths-ignore:
+      - "**.md"
+      - docs/**
+      - LICENSE
+      - PayrollRTITests/**
+      - .github/workflows/ci.yml
+      - .swiftlint.yml
+      - .swift-format
+      - scripts/format.sh
+      - scripts/make-fake-bpt.sh
   workflow_dispatch:
 
 permissions:

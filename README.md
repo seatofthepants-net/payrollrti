@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="design/icon-512.png" width="128" height="128" alt="PayrollRTI icon">
+  <img src="PayrollRTI/Resources/Assets.xcassets/AppIcon.appiconset/icon_256x256@2x.png" width="128" height="128" alt="PayrollRTI icon">
 </p>
 
 <h1 align="center">PayrollRTI</h1>
@@ -181,7 +181,8 @@ open build/DerivedData/Build/Products/Debug/PayrollRTI.app --args -bptAppPath "/
 ```
 
 Debug builds also accept `-debugSnapshotDir <dir>`, which writes a PNG of the window each time the server state
-changes. That's how the screenshots above were made.
+changes. That's how the screenshots above were made, with `-debugAppearance light` so they stay readable on GitHub's
+dark theme and `-debugPretendBPTMissing YES` for the not-installed screen.
 
 The unit tests use the same approach. They start a stand-in server, stop it, check that it escalates to SIGKILL
 when SIGTERM is ignored, report a crash, and attach to a server that's already running.
@@ -202,9 +203,10 @@ scripts/release.sh 0.1.0                 # Developer ID signed + notarised (need
 publishes a GitHub Release. The release includes the DMG, a SHA-256 checksum, and a changelog of commits since the
 previous tag.
 
-Every push to `main` (and a manual **Run workflow** on `main`) runs the same signed, notarised build as
-`0.0.0-main.<run number>`. It doesn't create a release; the DMG and checksum are kept as a workflow artifact for 30
-days. To fetch the latest one:
+Every push to `main` that changes the app (and a manual **Run workflow** on `main`) runs the same signed, notarised
+build as `0.0.0-main.<run number>`. Pushes that only touch docs, tests or lint/format config are skipped; see
+`paths-ignore` in the workflow. It doesn't create a release; the DMG and checksum are kept as a workflow artifact for
+30 days. To fetch the latest one:
 
 ```sh
 gh run download "$(gh run list --workflow release.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
