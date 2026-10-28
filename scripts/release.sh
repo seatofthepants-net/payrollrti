@@ -72,7 +72,7 @@ ditto "$app" "$staging/PayrollRTI.app"
 dmg_args=(
   --volname "PayrollRTI"
   --volicon "$app/Contents/Resources/AppIcon.icns"
-  --background design/dmg-background.tiff
+  --background scripts/dmg-background.tiff
   --window-pos 200 120 --window-size 660 400
   --icon-size 128 --text-size 13
   --icon "PayrollRTI.app" 170 200

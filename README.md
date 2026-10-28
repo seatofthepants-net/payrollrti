@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="design/icon-512.png" width="128" height="128" alt="PayrollRTI icon">
+  <img src="PayrollRTI/Resources/Assets.xcassets/AppIcon.appiconset/icon_256x256@2x.png" width="128" height="128" alt="PayrollRTI icon">
 </p>
 
 <h1 align="center">PayrollRTI</h1>
@@ -181,7 +181,8 @@ open build/DerivedData/Build/Products/Debug/PayrollRTI.app --args -bptAppPath "/
 ```
 
 Debug builds also accept `-debugSnapshotDir <dir>`, which writes a PNG of the window each time the server state
-changes. That's how the screenshots above were made.
+changes. That's how the screenshots above were made, with `-debugAppearance light` so they stay readable on GitHub's
+dark theme and `-debugPretendBPTMissing YES` for the not-installed screen.
 
 The unit tests use the same approach. They start a stand-in server, stop it, check that it escalates to SIGKILL
 when SIGTERM is ignored, report a crash, and attach to a server that's already running.
