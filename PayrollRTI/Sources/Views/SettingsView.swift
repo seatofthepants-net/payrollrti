@@ -3,6 +3,8 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var server: ServerController
+    @EnvironmentObject private var appUpdates: AppUpdater
+    @Environment(\.appActions) private var actions
     @AppStorage(SettingsKey.port) private var port = AppSettings.defaultPort
     @AppStorage(SettingsKey.openMode) private var openMode = OpenMode.embedded
     @AppStorage(SettingsKey.engine) private var engine = BPTEngine.macInstaller
@@ -89,7 +91,15 @@ struct SettingsView: View {
                     Text("PayrollRTI \(Self.appVersion)")
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Link("Check for PayrollRTI updates", destination: Links.releases)
+                    switch appUpdates.status {
+                    case .checking:
+                        ProgressView().controlSize(.small)
+                    case .available, .downloading, .verifying, .readyToInstall:
+                        Button("Update available…") { appUpdates.showsDetails = true }
+                    case .idle, .upToDate, .failed:
+                        Button("Check for Updates") { actions?.checkForAppUpdatesInteractively() }
+                    }
+                    Link("Releases", destination: Links.releases)
                 }
                 .font(.callout)
             }

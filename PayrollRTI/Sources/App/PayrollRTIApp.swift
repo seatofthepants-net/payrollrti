@@ -11,6 +11,7 @@ struct PayrollRTIApp: App {
                 .environmentObject(appDelegate.updates)
                 .environmentObject(appDelegate.browser)
                 .environmentObject(appDelegate.linuxBuild)
+                .environmentObject(appDelegate.appUpdates)
                 .environment(\.appActions, appDelegate)
                 .frame(minWidth: 800, minHeight: 560)
         }
@@ -24,6 +25,7 @@ struct PayrollRTIApp: App {
                 .environmentObject(appDelegate.server)
                 .environmentObject(appDelegate.updates)
                 .environmentObject(appDelegate.linuxBuild)
+                .environmentObject(appDelegate.appUpdates)
                 .environment(\.appActions, appDelegate)
         }
 

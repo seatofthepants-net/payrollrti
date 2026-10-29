@@ -147,7 +147,11 @@ final class LinuxBuildInstaller: ObservableObject {
             phase = .downloading(nil)
             try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
             let zip = work.appendingPathComponent("payetools-rti-\(version)-linux.zip")
-            try await download(Self.downloadURL(for: version), to: zip)
+            try await Download.file(Self.downloadURL(for: version), to: zip) { [weak self] fraction in
+                Task { @MainActor in
+                    if case .downloading = self?.phase { self?.phase = .downloading(fraction) }
+                }
+            }
             phase = .extracting
             let staged = work.appendingPathComponent("payload")
             try await Task.detached(priority: .userInitiated) {
@@ -167,45 +171,6 @@ final class LinuxBuildInstaller: ObservableObject {
 
     static func downloadURL(for version: BPTVersion) -> URL {
         downloadBase.appendingPathComponent("payetools-rti-\(version)-linux.zip")
-    }
-
-    private func download(_ url: URL, to destination: URL) async throws {
-        var request = URLRequest(url: url, timeoutInterval: 60)
-        request.setValue("PayrollRTI (+\(Links.repository.absoluteString))", forHTTPHeaderField: "User-Agent")
-        let session = URLSession(configuration: .ephemeral)
-        defer { session.finishTasksAndInvalidate() }
-
-        var observation: NSKeyValueObservation?
-        defer { observation?.invalidate() }
-        let response: URLResponse = try await withCheckedThrowingContinuation { continuation in
-            let task = session.downloadTask(with: request) { temporary, response, error in
-                // The temporary file is deleted when this handler returns, so claim it here.
-                if let error {
-                    continuation.resume(throwing: error)
-                } else if let temporary, let response {
-                    do {
-                        try FileManager.default.moveItem(at: temporary, to: destination)
-                        continuation.resume(returning: response)
-                    } catch {
-                        continuation.resume(throwing: error)
-                    }
-                } else {
-                    continuation.resume(throwing: URLError(.unknown))
-                }
-            }
-            observation = task.progress.observe(\.fractionCompleted, options: [.new]) { progress, _ in
-                let fraction = progress.totalUnitCount > 0 ? progress.fractionCompleted : nil
-                Task { @MainActor [weak self] in
-                    if case .downloading = self?.phase { self?.phase = .downloading(fraction) }
-                }
-            }
-            task.resume()
-        }
-        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-            throw Failure(
-                message: "GOV.UK didn't have \(url.lastPathComponent) "
-                    + "(HTTP \((response as? HTTPURLResponse)?.statusCode ?? 0)).")
-        }
     }
 
     /// zip → AppImage → squashfs → `usr/bptserver` without its x86_64 `.so` files, checked against the runtime.

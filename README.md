@@ -175,8 +175,14 @@ starts it updates its database first, and the window says "Preparing the payroll
 PayrollRTI also takes a backup of its own before anything that could change your data: before downloading a
 Linux build (`…_PRE-INSTALL.bak`) and before starting a version that will update the database
 (`…_PRE-UPGRADE.bak`). All are saved in `~/HMRC/payetools-rti/backups/` in BPT's own format, so **Restore your
-data** in Basic PAYE Tools can read any of them. Updates to PayrollRTI itself are listed on the
-[Releases](https://github.com/seatofthepants-net/payrollrti/releases) page, which is linked from Settings.
+data** in Basic PAYE Tools can read any of them.
+
+**Updating PayrollRTI itself.** PayrollRTI checks GitHub's releases when it starts and from **PayrollRTI > Check
+for PayrollRTI Updates…**. A banner offers the new version; **What's new and install…** shows the release notes
+and, on **Download and Install**, downloads the disk image, checks it against the published checksum, stops
+Basic PAYE Tools (running its backup-on-exit as a normal quit does), replaces the app with the new one and opens
+it. The previous version goes to the Trash. A pre-release build is offered later pre-releases; a release build
+is only offered releases.
 
 ## Building from source
 
@@ -197,7 +203,7 @@ Format and lint with `scripts/format.sh`. It needs `swift format`, included with
 (`brew install swiftlint`).
 
 The Linux engine's native Python runtime isn't in the repository. Build it once with
-`brew install openssl@1.1 jpeg-turbo && sh rehost/build-runtime.sh` (about five minutes; output in
+`brew install jpeg-turbo && sh rehost/build-runtime.sh` (about five minutes; output in
 `~/Library/PayrollRTI-Linux/build/LinuxBuildRuntime`, or set `OUT`). The "Embed Linux build runtime" build phase
 copies it into the app from there, or from `LINUX_RUNTIME_DIR`; without it the app still builds and the Linux
 engine shows as unavailable.
@@ -296,12 +302,16 @@ Or add them under **Settings > Secrets and variables > Actions**:
 
 Delete the local `.p12` and `.p8` copies once they're stored somewhere safe, such as a password manager.
 
-### 4. Cut a release
+### 4. Cut a release, or a pre-release for testers
 
 ```sh
 git tag v0.1.0
 git push origin v0.1.0
 ```
+
+A tag with a suffix, such as `v0.2.0-beta.1`, builds the same signed, notarised DMG but publishes it as a GitHub
+**pre-release**: it gets its own page to send testers, and it never shows as the latest release. Tag from `main`
+after merging, so the changelog lists what testers have.
 
 The workflow fails early with a clear message if any secret is missing. If notarisation is rejected, Apple's log is
 printed in the job output.

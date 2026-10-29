@@ -29,7 +29,8 @@ struct StatusMenu: View {
         Button("Open in Safari") { actions?.openInSafari() }
             .disabled(!server.isRunning)
         Divider()
-        Button("Check for Updates…") { actions?.checkForUpdatesInteractively() }
+        Button("Check for PayrollRTI Updates…") { actions?.checkForAppUpdatesInteractively() }
+        Button("Check for Basic PAYE Tools Updates…") { actions?.checkForUpdatesInteractively() }
         SettingsLink { Text("Settings…") }
             .keyboardShortcut(",")
         Divider()

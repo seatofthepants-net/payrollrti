@@ -8,6 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let updates = UpdateChecker()
     let browser = BrowserState()
     let linuxBuild = LinuxBuildInstaller()
+    let appUpdates = AppUpdater()
 
     private var cancellables: Set<AnyCancellable> = []
     private var signalSources: [DispatchSourceSignal] = []
@@ -47,6 +48,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         #endif
         server.start()
         Task { await updates.check(installed: server.installation?.version) }
+        Task { await appUpdates.check() }
     }
 
     /// Closing the window leaves the server running behind the menu-bar icon.
@@ -107,6 +109,50 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSWorkspace.shared.open(server.logURL)
         } else {
             NSWorkspace.shared.open(server.logURL.deletingLastPathComponent())
+        }
+    }
+
+    /// Menu-driven check for a new PayrollRTI: opens the notes-and-install sheet, or says it's up to date.
+    func checkForAppUpdatesInteractively() {
+        Task {
+            await appUpdates.check()
+            NSApp.activate(ignoringOtherApps: true)
+            if appUpdates.available != nil {
+                showMainWindow()
+                appUpdates.showsDetails = true
+                return
+            }
+            let alert = NSAlert()
+            if case .failed(let message) = appUpdates.status {
+                alert.messageText = "Couldn't check for PayrollRTI updates"
+                alert.informativeText = message
+            } else {
+                alert.messageText = "PayrollRTI is up to date"
+                alert.informativeText = "You have \(appUpdates.current.description)."
+            }
+            alert.runModal()
+        }
+    }
+
+    private func showMainWindow() {
+        if let window = NSApp.windows.first(where: { $0.title == "Basic PAYE Tools" }) {
+            window.makeKeyAndOrderFront(nil)
+        }
+    }
+
+    /// Installs a staged PayrollRTI update: stop Basic PAYE Tools (with its backup-on-exit, as a normal quit
+    /// does), start the watcher that swaps the bundle once we're gone, and exit. Not `NSApp.terminate`: the
+    /// async shutdown and AppKit's wait for it both need the main queue, and from a button action they deadlock.
+    func installAppUpdate() {
+        Task {
+            await server.stop()
+            do {
+                try appUpdates.launchInstaller()
+            } catch {
+                appUpdates.reportInstallFailure(error.localizedDescription)
+                return
+            }
+            exit(0)
         }
     }
 

@@ -12,7 +12,8 @@
 # lxml 4.5.2, Pillow 6.2.2, reportlab 3.5.0 (pure Python; its accelerators are unused by BPT),
 # scandir 1.10.0, 4Suite-XML 1.0.2. Python 2.7.18 is the version HMRC froze.
 #
-# Needs: Xcode Command Line Tools, Homebrew openssl@1.1 and jpeg-turbo (static libraries only).
+# Needs: Xcode Command Line Tools and Homebrew jpeg-turbo (for its static libjpeg). OpenSSL 1.1.1 is built from
+# source because Homebrew disabled openssl@1.1 in November 2024.
 set -eu
 
 OUT=${OUT:-"$HOME/Library/PayrollRTI-Linux/build"}
@@ -31,10 +32,23 @@ cd "$SRC"
 
 fetch() { [ -f "$2" ] || curl -fsSL -o "$2" "$1"; }
 
+# ---- OpenSSL 1.1.1w, static, the last line CPython 2.7's _ssl supports ---------------------------
+OPENSSL="$OUT/openssl"
+if [ ! -f "$OPENSSL/lib/libssl.a" ]; then
+  fetch https://github.com/openssl/openssl/releases/download/OpenSSL_1_1_1w/openssl-1.1.1w.tar.gz openssl-1.1.1w.tar.gz
+  rm -rf openssl-1.1.1w && tar xzf openssl-1.1.1w.tar.gz
+  (
+    cd openssl-1.1.1w
+    ./Configure darwin64-arm64-cc no-shared --prefix="$OPENSSL" > configure.log 2>&1
+    make -j"$JOBS" > make.log 2>&1
+    make install_sw > install.log 2>&1
+  )
+fi
+
 # Link directories holding only static archives, so `-lssl` and `-ljpeg` can't pick up a Homebrew dylib.
 STATIC="$OUT/static-libs"
 mkdir -p "$STATIC"
-ln -sf "$BREW/openssl@1.1/lib/libssl.a" "$BREW/openssl@1.1/lib/libcrypto.a" "$BREW/jpeg-turbo/lib/libjpeg.a" "$STATIC/"
+ln -sf "$OPENSSL/lib/libssl.a" "$OPENSSL/lib/libcrypto.a" "$BREW/jpeg-turbo/lib/libjpeg.a" "$STATIC/"
 
 # ---- CPython 2.7.18 with pyenv's Apple Silicon patches --------------------------------------------
 PYENV_PATCHES=https://raw.githubusercontent.com/pyenv/pyenv/master/plugins/python-build/share/python-build/patches/2.7.18/Python-2.7.18
@@ -52,8 +66,8 @@ if [ ! -x "$RUNTIME/bin/python2.7" ]; then
     cd Python-2.7.18
     for p in ../*.patch; do patch -p1 -s < "$p"; done
     # -isysroot must be in the Makefile's CFLAGS: setup.py only finds zlib/bz2 headers in the SDK via it.
-    export CFLAGS="-isysroot $SDK -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration -I$BREW/openssl@1.1/include"
-    export CPPFLAGS="-isysroot $SDK -I$BREW/openssl@1.1/include"
+    export CFLAGS="-isysroot $SDK -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration -I$OPENSSL/include"
+    export CPPFLAGS="-isysroot $SDK -I$OPENSSL/include"
     export LDFLAGS="-L$STATIC"
     ./configure --prefix="$RUNTIME" --enable-unicode=ucs4 --with-ensurepip=install \
       MACOSX_DEPLOYMENT_TARGET=14.0 > configure.log 2>&1

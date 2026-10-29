@@ -6,9 +6,14 @@ struct MainView: View {
     @EnvironmentObject private var browser: BrowserState
     @AppStorage(SettingsKey.openMode) private var openMode = OpenMode.embedded
     @AppStorage(SettingsKey.engine) private var engine = BPTEngine.macInstaller
+    @EnvironmentObject private var appUpdates: AppUpdater
 
     var body: some View {
         VStack(spacing: 0) {
+            if appUpdates.showsBanner {
+                AppUpdateBanner()
+                Divider()
+            }
             if updates.showsBanner, let latest = updates.availableUpdate {
                 UpdateBanner(version: latest, downloadsInApp: engine == .linuxBuild) {
                     updates.isBannerDismissed = true
@@ -17,6 +22,7 @@ struct MainView: View {
             }
             content
         }
+        .sheet(isPresented: $appUpdates.showsDetails) { AppUpdateSheet().environmentObject(appUpdates) }
     }
 
     @ViewBuilder private var content: some View {
