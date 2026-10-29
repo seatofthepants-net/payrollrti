@@ -79,6 +79,12 @@ struct SettingsView: View {
             }
 
             Section {
+                BPTUpdatesStatus()
+            } header: {
+                Text("Basic PAYE Tools updates")
+            }
+
+            Section {
                 HStack {
                     Text("PayrollRTI \(Self.appVersion)")
                         .foregroundStyle(.secondary)

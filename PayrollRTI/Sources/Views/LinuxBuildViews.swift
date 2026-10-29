@@ -51,6 +51,11 @@ struct LinuxBuildDownloadControls: View {
                 }
                 Text("Downloading from GOV.UK…")
             }
+        case .backingUp:
+            HStack {
+                ProgressView().controlSize(.small)
+                Text("Backing up your payroll data first…")
+            }
         case .extracting:
             HStack {
                 ProgressView().controlSize(.small)

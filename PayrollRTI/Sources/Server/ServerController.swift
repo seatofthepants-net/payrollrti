@@ -205,7 +205,17 @@ final class ServerController: ObservableObject {
             return false
         }
         if case .upgrade(let pending) = compatibility {
-            appendLog("--- database needs \(pending) migration(s); startdb will apply them")
+            // startdb will migrate the schema; keep a copy BPT can restore in case that goes wrong.
+            progress = "Backing up payroll data before Basic PAYE Tools updates it…"
+            do {
+                let backup = try BPTBackup.write(
+                    database: database.url, version: AppSettings.newestStartedVersion, reason: "PRE-UPGRADE",
+                    to: dataDirectory.appendingPathComponent("backups"))
+                appendLog("--- database needs \(pending) migration(s); backed up to \(backup.lastPathComponent)")
+            } catch {
+                fail("Couldn't back up your payroll data before updating it: \(error.localizedDescription)")
+                return false
+            }
         }
 
         progress = "Preparing the payroll database…"

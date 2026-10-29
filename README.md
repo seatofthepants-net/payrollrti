@@ -163,14 +163,20 @@ menu, as HMRC describe.
 and HMRC's [other service issues](https://www.gov.uk/government/collections/hm-revenue-and-customs-service-availability-and-issues).
 For anything else, contact the [online services helpdesk](https://www.gov.uk/hmrc-online-services-helpdesk).
 
-**Updating Basic PAYE Tools.** When a new version is out, PayrollRTI shows a banner with a link to GOV.UK. Quit
-PayrollRTI before running HMRC's installer so it can replace the running copy. The next time you open PayrollRTI,
-BPT updates its database before it starts, and the window says "Preparing the payroll database…" while that happens.
+**Updating Basic PAYE Tools.** PayrollRTI asks HMRC's own update feed (the one Basic PAYE Tools polls) for the
+latest version, falling back to the GOV.UK page, and checks which builds HMRC publish for it. **Settings > Basic
+PAYE Tools updates** shows the result, when it was checked, and what it means for the engine you use; **Server >
+Check for Updates** shows the same in a dialog. When a new version is out, a banner appears. On the Mac
+installer engine it links to GOV.UK: quit PayrollRTI before running HMRC's installer so it can replace the running
+copy. On the Linux engine PayrollRTI downloads the new version itself. Either way, the next time Basic PAYE Tools
+starts it updates its database first, and the window says "Preparing the payroll database…" while that happens.
 
-**Backups.** When you quit, PayrollRTI runs BPT's own backup-on-exit, which follows the backup settings in BPT. Backups
-are saved in `~/HMRC/payetools-rti/backups/`. Updates to PayrollRTI itself are
-listed on the [Releases](https://github.com/seatofthepants-net/payrollrti/releases) page, which is linked from
-Settings.
+**Backups.** When you quit, PayrollRTI runs BPT's own backup-on-exit, which follows the backup settings in BPT.
+PayrollRTI also takes a backup of its own before anything that could change your data: before downloading a
+Linux build (`…_PRE-INSTALL.bak`) and before starting a version that will update the database
+(`…_PRE-UPGRADE.bak`). All are saved in `~/HMRC/payetools-rti/backups/` in BPT's own format, so **Restore your
+data** in Basic PAYE Tools can read any of them. Updates to PayrollRTI itself are listed on the
+[Releases](https://github.com/seatofthepants-net/payrollrti/releases) page, which is linked from Settings.
 
 ## Building from source
 

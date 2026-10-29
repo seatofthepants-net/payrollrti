@@ -99,6 +99,8 @@ enum LinuxBuildStore {
 final class LinuxBuildInstaller: ObservableObject {
     enum Phase: Equatable {
         case idle
+        /// A copy of the payroll database in BPT's own backup format, before anything else happens.
+        case backingUp
         /// Fraction complete, or nil before the size is known.
         case downloading(Double?)
         case extracting
@@ -117,22 +119,32 @@ final class LinuxBuildInstaller: ObservableObject {
 
     var isBusy: Bool {
         switch phase {
-        case .downloading, .extracting: return true
+        case .backingUp, .downloading, .extracting: return true
         case .idle, .installed, .failed: return false
         }
     }
 
-    func install(version: BPTVersion) async {
+    /// Downloads and installs `version`. If there is payroll data, it's backed up first (into BPT's own backups
+    /// folder, in BPT's format) so that whatever happens next is recoverable with BPT's Restore.
+    func install(version: BPTVersion, database: BPTDatabase = .default) async {
         guard !isBusy else { return }
         guard let runtime = LinuxBuildRuntime.bundled else {
             phase = .failed("This build of PayrollRTI doesn't include the runtime for HMRC's Linux build.")
             return
         }
-        phase = .downloading(nil)
         let work = FileManager.default.temporaryDirectory
             .appendingPathComponent("PayrollRTI-linux-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: work) }
         do {
+            if database.exists {
+                phase = .backingUp
+                let current = BPTInstallation.locate(engine: AppSettings.engine)?.version
+                _ = try BPTBackup.write(
+                    database: database.url, version: current ?? AppSettings.newestStartedVersion,
+                    reason: "PRE-INSTALL",
+                    to: database.url.deletingLastPathComponent().appendingPathComponent("backups"))
+            }
+            phase = .downloading(nil)
             try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
             let zip = work.appendingPathComponent("payetools-rti-\(version)-linux.zip")
             try await download(Self.downloadURL(for: version), to: zip)

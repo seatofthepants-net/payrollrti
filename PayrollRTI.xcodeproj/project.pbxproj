@@ -16,9 +16,12 @@
 		27CD667327422905797A8476 /* BrowserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7D8100A93D74F44BCF5583 /* BrowserState.swift */; };
 		31CD9172820F218375DCBBD0 /* LinuxBuildViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0939A9A93CA2BABE6ECD4A /* LinuxBuildViews.swift */; };
 		384497DF8C5833ED203AEF59 /* ServerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC0157A71D3F0B5CD863DEA /* ServerController.swift */; };
+		3A19FCAD962BB2A328F036BD /* BPTBackupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023987E94768AD70FF229A3D /* BPTBackupTests.swift */; };
 		3BB1026CAA953271CF899EF0 /* BPTVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788FC7AB017826391B3E91AD /* BPTVersion.swift */; };
 		41BA23F113BC84C5B37DABAA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04ED92349ABDEC4C788E1149 /* Assets.xcassets */; };
+		4C31655B4C6C445A22B972D1 /* BPTBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EB0AF0F059352C64275D0D5 /* BPTBackup.swift */; };
 		51F03A85E34603EF0531833B /* UpdateCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */; };
+		5ADE36850B1005EE8A240892 /* BPTUpdatesStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADF2F63450920656A3320D /* BPTUpdatesStatus.swift */; };
 		679DCD969529478E767F05AE /* StatusMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C7DA9CA3D35F5639114DAB /* StatusMenu.swift */; };
 		6BF86192995E7B1BB474C970 /* PayrollRTIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC9921F5F670FD94EE790E4 /* PayrollRTIApp.swift */; };
 		6F0ABDD0042BB3807E36FB6A /* SquashFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A73497F1FCEE390DD6703C60 /* SquashFS.swift */; };
@@ -58,9 +61,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		023987E94768AD70FF229A3D /* BPTBackupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTBackupTests.swift; sourceTree = "<group>"; };
 		04ED92349ABDEC4C788E1149 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		09C7DA9CA3D35F5639114DAB /* StatusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenu.swift; sourceTree = "<group>"; };
 		0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTInstallationTests.swift; sourceTree = "<group>"; };
+		0EB0AF0F059352C64275D0D5 /* BPTBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTBackup.swift; sourceTree = "<group>"; };
 		10031A9038A561DB579821C8 /* PayrollRTITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PayrollRTITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		113740A2ABF8579905A67E4F /* xz.squashfs */ = {isa = PBXFileReference; path = xz.squashfs; sourceTree = "<group>"; };
 		245F1AF014E39A68B5EECC46 /* WebViewCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewCoordinatorTests.swift; sourceTree = "<group>"; };
@@ -78,6 +83,7 @@
 		8BACBCA757461E22D86B6CE8 /* prefixed.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = prefixed.zip; sourceTree = "<group>"; };
 		8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
 		91ADEAEE9E98B5814DE73DC4 /* ServerController+Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ServerController+Support.swift"; sourceTree = "<group>"; };
+		93ADF2F63450920656A3320D /* BPTUpdatesStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTUpdatesStatus.swift; sourceTree = "<group>"; };
 		9489846AEEA115B86F7DB02B /* EngineChoiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineChoiceView.swift; sourceTree = "<group>"; };
 		9AC6ED1A69493A960CA81AB6 /* PayrollRTI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PayrollRTI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B0939A9A93CA2BABE6ECD4A /* LinuxBuildViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinuxBuildViews.swift; sourceTree = "<group>"; };
@@ -139,6 +145,7 @@
 		785A8569C7ADC92CFF207A88 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				93ADF2F63450920656A3320D /* BPTUpdatesStatus.swift */,
 				9489846AEEA115B86F7DB02B /* EngineChoiceView.swift */,
 				9B0939A9A93CA2BABE6ECD4A /* LinuxBuildViews.swift */,
 				CC02B6D2F1E56E18909E5F5D /* MainView.swift */,
@@ -152,6 +159,7 @@
 			isa = PBXGroup;
 			children = (
 				B4E19EBCF1C024996AE318DA /* AppImageTests.swift */,
+				023987E94768AD70FF229A3D /* BPTBackupTests.swift */,
 				3607EB4A43FCCA7F14624C3C /* BPTDatabaseTests.swift */,
 				0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */,
 				C03C083BED45BBCCE425CC8A /* BPTVersionTests.swift */,
@@ -171,6 +179,7 @@
 			children = (
 				546DD35AA84F6D89E859586B /* AppImage.swift */,
 				2D126CF5729F50C52E391907 /* AppSettings.swift */,
+				0EB0AF0F059352C64275D0D5 /* BPTBackup.swift */,
 				DB2877FD76D21503880D27B2 /* BPTDatabase.swift */,
 				CDD8F042E183096A54B5E936 /* BPTInstallation.swift */,
 				788FC7AB017826391B3E91AD /* BPTVersion.swift */,
@@ -368,6 +377,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7836391BA4E9B54C3ECD78A /* AppImageTests.swift in Sources */,
+				3A19FCAD962BB2A328F036BD /* BPTBackupTests.swift in Sources */,
 				D5C9F57D3A5AB607B4D69193 /* BPTDatabaseTests.swift in Sources */,
 				1E42E30A10AE468523EE44DC /* BPTInstallationTests.swift in Sources */,
 				F40130152EF3AB139D109354 /* BPTVersionTests.swift in Sources */,
@@ -388,8 +398,10 @@
 				A9DF80CBEFA00D3F9F896F54 /* AppDelegate.swift in Sources */,
 				BAFFD57FF3FF82ACC7BB2A43 /* AppImage.swift in Sources */,
 				EBAE64ACB59CB09431080BF1 /* AppSettings.swift in Sources */,
+				4C31655B4C6C445A22B972D1 /* BPTBackup.swift in Sources */,
 				A12C80248FA5789FCDAD6685 /* BPTDatabase.swift in Sources */,
 				758B3187837E56B75C922682 /* BPTInstallation.swift in Sources */,
+				5ADE36850B1005EE8A240892 /* BPTUpdatesStatus.swift in Sources */,
 				3BB1026CAA953271CF899EF0 /* BPTVersion.swift in Sources */,
 				218F9B52D9418F4D581C9ECB /* BPTWebView.swift in Sources */,
 				27CD667327422905797A8476 /* BrowserState.swift in Sources */,

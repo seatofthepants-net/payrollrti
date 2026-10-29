@@ -216,6 +216,9 @@ struct UpdateBanner: View {
         case .downloading(let fraction):
             ProgressView(value: fraction ?? 0).frame(width: 120)
             Text(fraction.map { "\(Int($0 * 100))%" } ?? "Downloading…").monospacedDigit()
+        case .backingUp:
+            ProgressView().controlSize(.small)
+            Text("Backing up…")
         case .extracting:
             ProgressView().controlSize(.small)
             Text("Unpacking…")

@@ -193,6 +193,9 @@ struct EngineChoiceView: View {
             ProgressView(value: fraction ?? 0).tint(Brand.green)
             Text(fraction.map { "\(Int($0 * 100))% of about 190 MB" } ?? "Starting…")
                 .font(.caption).foregroundStyle(.secondary).monospacedDigit()
+        case .backingUp:
+            EngineStatus(symbol: "externaldrive", tint: Brand.green, text: "Backing up your payroll data first…")
+            ProgressView().controlSize(.small)
         case .extracting:
             EngineStatus(symbol: "shippingbox", tint: Brand.green, text: "Unpacking…")
             ProgressView().controlSize(.small)

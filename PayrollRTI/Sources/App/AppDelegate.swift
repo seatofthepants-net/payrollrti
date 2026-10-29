@@ -147,6 +147,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             case .idle, .checking:
                 return
             }
+            if let release = updates.release {
+                let mac = release.macInstaller == true ? "published" : "not published"
+                let linux = release.linuxBuild == true ? "published" : "not published"
+                alert.informativeText +=
+                    "\n\nHMRC publish for \(release.version): Mac installer \(mac), Linux build \(linux) "
+                    + "(from \(release.source)).\n\n"
+                    + UpdateChecker.advice(
+                        engine: AppSettings.engine, release: release,
+                        linuxEngineAvailable: LinuxBuildRuntime.bundled != nil)
+            }
             NSApp.activate(ignoringOtherApps: true)
             if alert.runModal() == .alertFirstButtonReturn, alert.buttons.count > 1 {
                 if AppSettings.engine == .linuxBuild, let downloadable {
