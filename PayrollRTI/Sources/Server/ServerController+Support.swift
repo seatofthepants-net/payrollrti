@@ -95,9 +95,9 @@ extension ServerController {
 
     /// HMRC's own Basic PAYE Tools app shares the database with whichever engine we run, so it must not be open.
     static func isBPTAppRunning() -> Bool {
-        let bptPath = BPTInstallation.configuredAppURL.standardizedFileURL.path
+        let identifiers = [BPTInstallation.outerBundleIdentifier, BPTInstallation.serverBundleIdentifier]
         return NSWorkspace.shared.runningApplications.contains {
-            $0.bundleURL?.standardizedFileURL.path == bptPath
+            $0.bundleIdentifier.map(identifiers.contains) ?? false
         }
     }
 

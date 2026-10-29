@@ -122,7 +122,7 @@ extension BPTInstallation {
         let paths: [String]
         switch self {
         case .macInstaller(let appURL):
-            let lib = appURL.appendingPathComponent("Contents/Helpers/rti.app/Contents/Resources/lib/python2.7")
+            let lib = BPTInstallation.serverApp(in: appURL).appendingPathComponent("Contents/Resources/lib/python2.7")
             guard let files = FileManager.default.enumerator(at: lib, includingPropertiesForKeys: nil) else {
                 throw BPTDatabase.Failure(message: "no Python library in \(appURL.lastPathComponent)")
             }

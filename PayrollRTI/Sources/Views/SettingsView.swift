@@ -71,7 +71,20 @@ struct SettingsView: View {
             }
 
             Section {
-                LabeledContent("Location", value: server.installation?.location.path ?? "Not installed")
+                LabeledContent("Location") {
+                    HStack {
+                        Text(server.installation?.location.path ?? "Not installed")
+                            .textSelection(.enabled)
+                        if engine == .macInstaller {
+                            Button("Choose…") {
+                                if case .chosen = BPTInstallation.chooseMacInstaller() {
+                                    server.refreshInstallation()
+                                }
+                            }
+                            .controlSize(.small)
+                        }
+                    }
+                }
                 LabeledContent("Version", value: server.installation?.version?.description ?? "Unknown")
                 if let newest = AppSettings.newestStartedVersion {
                     LabeledContent("Payroll database last used by", value: newest.description)

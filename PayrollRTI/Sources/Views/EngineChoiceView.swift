@@ -15,6 +15,20 @@ struct EngineChoiceView: View {
     @State private var rosetta = Rosetta.status()
     @State private var installingRosetta = false
     @State private var rosettaError: String?
+    @State private var chooseError: String?
+
+    private func chooseMacInstaller() {
+        switch BPTInstallation.chooseMacInstaller() {
+        case .chosen:
+            chooseError = nil
+            engine = .macInstaller
+            server.start()
+        case .cancelled:
+            break
+        case .notBasicPAYETools(let url):
+            chooseError = "\(url.lastPathComponent) doesn't contain Basic PAYE Tools' rti program."
+        }
+    }
 
     private func installRosetta() {
         installingRosetta = true
@@ -238,13 +252,18 @@ struct EngineChoiceView: View {
             } else {
                 StatusRow(
                     symbol: "xmark.circle", tint: Brand.secondaryText, text: "Not installed",
-                    detail: "Install it from GOV.UK, then check again")
+                    detail:
+                        "Looked in /Applications and where older installers put it. If yours is elsewhere, choose it.")
                 HStack(spacing: 10) {
+                    SecondaryButton("Choose…") { chooseMacInstaller() }
                     SecondaryButton("Download from GOV.UK") { NSWorkspace.shared.open(Links.bptDownload) }
                     SecondaryButton("Check again") {
                         engine = .macInstaller
                         server.start()
                     }
+                }
+                if let chooseError {
+                    Text(chooseError).font(.system(size: 12)).foregroundStyle(.red)
                 }
             }
         }

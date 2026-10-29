@@ -23,15 +23,19 @@ enum FakeBPT {
         return text.split(separator: "\n").map(String.init)
     }
 
-    /// Mirrors real BPT: CFBundleShortVersionString is just "26.1"; CFBundleVersion has the full number.
+    /// Mirrors real BPT: CFBundleShortVersionString is just "26.1"; CFBundleVersion has the full number. The `rti`
+    /// goes where HMRC's installer puts it, inside `Contents/Helpers/rti.app`, unless `serverAppOnly`, which
+    /// mimics the relocated server app some Macs end up with.
     static func make(
-        version: String = "26.1.26134.173934", shortVersion: String = "26.1", behaviour: Behaviour = .serve
+        version: String = "26.1.26134.173934", shortVersion: String = "26.1", behaviour: Behaviour = .serve,
+        serverAppOnly: Bool = false
     ) throws -> BPTInstallation {
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("FakeBPT-\(UUID().uuidString)")
-            .appendingPathComponent("Basic PAYE Tools.app")
+            .appendingPathComponent(serverAppOnly ? "rti.app" : "Basic PAYE Tools.app")
         let installation = BPTInstallation.macInstaller(appURL: root)
-        let executable = BPTInstallation.macInstallerExecutable(in: root)
+        let serverApp = serverAppOnly ? root : root.appendingPathComponent("Contents/Helpers/rti.app")
+        let executable = serverApp.appendingPathComponent("Contents/MacOS/rti")
         try FileManager.default.createDirectory(
             at: executable.deletingLastPathComponent(), withIntermediateDirectories: true)
 

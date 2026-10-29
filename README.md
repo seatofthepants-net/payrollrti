@@ -123,9 +123,13 @@ get the window back. **Quit PayrollRTI** (⌘Q) stops the server.
 These mirror HMRC's [service availability and issues](https://www.gov.uk/government/publications/basic-paye-tools-service-availability-and-issues/basic-paye-service-availability-and-issues)
 page, plus a few that are specific to PayrollRTI.
 
-**"Basic PAYE Tools isn't installed".** PayrollRTI looks for
-`/Applications/Basic PAYE Tools.app/Contents/Helpers/rti.app/Contents/MacOS/rti`. Install or reinstall BPT from
-[GOV.UK](https://www.gov.uk/basic-paye-tools), then click **Check Again**. Don't uninstall an existing copy: HMRC
+**"Basic PAYE Tools isn't installed".** PayrollRTI looks for HMRC's `rti` program in `/Applications/Basic PAYE
+Tools.app`, then in `/Applications/HMRC/payetools-rti/rti.app`, then wherever macOS has registered either of HMRC's
+bundles. HMRC's package contains two apps, Basic PAYE Tools and the `rti.app` server inside it, and macOS's installer
+puts a bundle wherever an older copy with the same identifier already was, so on a Mac that had an earlier BPT the
+server can end up alone at `/Applications/HMRC/payetools-rti/rti.app` (and HMRC's own Terminal instructions then fail
+with "No such file or directory"). PayrollRTI runs it from there. If yours is somewhere else again, click
+**Choose…** and pick either app; **Settings** has the same button. Don't uninstall an existing copy to reinstall: HMRC
 warn you'll lose payroll data.
 
 **HMRC's Terminal workaround fails with `no such table: bptrti_settings`.** On a fresh install, the workaround's
