@@ -183,7 +183,7 @@ enum ZipListing {
             let commentLength = Int(data.le16(at: position + 32))
             let nameStart = position + 46
             guard nameStart + nameLength <= data.count else { throw Error.corrupt }
-            names.append(String(decoding: data[nameStart..<nameStart + nameLength], as: UTF8.self))
+            names.append(String(bytes: data[nameStart..<nameStart + nameLength], encoding: .utf8) ?? "")
             position = nameStart + nameLength + extraLength + commentLength
         }
         return names

@@ -8,6 +8,13 @@ struct AppVersion: Comparable, CustomStringConvertible, Equatable {
     let components: [Int]
     let preRelease: [String]
 
+    static let zero = AppVersion(components: [0], preRelease: [])
+
+    private init(components: [Int], preRelease: [String]) {
+        self.components = components
+        self.preRelease = preRelease
+    }
+
     init?(_ string: String) {
         var text = string.trimmingCharacters(in: .whitespacesAndNewlines)
         if text.hasPrefix("v") { text.removeFirst() }
@@ -48,16 +55,11 @@ struct AppVersion: Comparable, CustomStringConvertible, Equatable {
     static func == (lhs: AppVersion, rhs: AppVersion) -> Bool { !(lhs < rhs) && !(rhs < lhs) }
 }
 
-/// A PayrollRTI release on GitHub, as the Releases API describes it.
+/// A PayrollRTI release on GitHub, as the Releases API describes it (decoded with `.convertFromSnakeCase`).
 struct AppRelease: Equatable, Decodable {
     struct Asset: Equatable, Decodable {
         let name: String
-        let browserDownloadURL: URL
-
-        enum CodingKeys: String, CodingKey {
-            case name
-            case browserDownloadURL = "browser_download_url"
-        }
+        let browserDownloadUrl: URL
     }
 
     let tagName: String
@@ -65,13 +67,13 @@ struct AppRelease: Equatable, Decodable {
     let body: String?
     let prerelease: Bool
     let draft: Bool
-    let htmlURL: URL
+    let htmlUrl: URL
     let assets: [Asset]
 
-    enum CodingKeys: String, CodingKey {
-        case tagName = "tag_name"
-        case name, body, prerelease, draft, assets
-        case htmlURL = "html_url"
+    static func decode(_ data: Data) throws -> [AppRelease] {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return try decoder.decode([AppRelease].self, from: data)
     }
 
     var version: AppVersion? { AppVersion(tagName) }
@@ -142,7 +144,7 @@ final class AppUpdater: ObservableObject {
 
     nonisolated static var runningVersion: AppVersion {
         let info = Bundle.main.infoDictionary ?? [:]
-        return AppVersion(info["CFBundleShortVersionString"] as? String ?? "") ?? AppVersion("0")!
+        return AppVersion(info["CFBundleShortVersionString"] as? String ?? "") ?? .zero
     }
 
     var available: AppRelease? {
@@ -190,7 +192,7 @@ final class AppUpdater: ObservableObject {
             try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
             status = .downloading(release, nil)
             let dmgFile = work.appendingPathComponent(dmg.name)
-            try await download(dmg.browserDownloadURL, dmgFile) { [weak self] fraction in
+            try await download(dmg.browserDownloadUrl, dmgFile) { [weak self] fraction in
                 Task { @MainActor in
                     if case .downloading = self?.status { self?.status = .downloading(release, fraction) }
                 }
@@ -198,7 +200,7 @@ final class AppUpdater: ObservableObject {
             status = .verifying(release)
             if let checksum = release.checksum {
                 let expected = work.appendingPathComponent(checksum.name)
-                try await download(checksum.browserDownloadURL, expected) { _ in }
+                try await download(checksum.browserDownloadUrl, expected) { _ in }
                 try Self.verify(dmgFile, against: expected)
             }
             let staged = try await Task.detached(priority: .userInitiated) {
@@ -247,7 +249,8 @@ final class AppUpdater: ObservableObject {
     // MARK: - Pieces
 
     nonisolated static func verify(_ dmg: URL, against checksumFile: URL) throws {
-        let published = try String(contentsOf: checksumFile, encoding: .utf8)
+        let published =
+            try String(contentsOf: checksumFile, encoding: .utf8)
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .split(separator: " ").first.map(String.init) ?? ""
         let actual = BPTBackup.sha256Hex(try Data(contentsOf: dmg, options: .alwaysMapped))
@@ -279,7 +282,7 @@ final class AppUpdater: ObservableObject {
         process.standardOutput = FileHandle.nullDevice
         process.standardError = errors
         try process.run()
-        let text = String(decoding: errors.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+        let text = String(bytes: errors.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
         process.waitUntilExit()
         guard process.terminationStatus == 0 else {
             throw Failure(message: "\(URL(fileURLWithPath: executable).lastPathComponent) failed: \(text)")
@@ -306,6 +309,6 @@ final class AppUpdater: ObservableObject {
         if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
             throw Failure(message: "GitHub answered HTTP \(http.statusCode).")
         }
-        return try JSONDecoder().decode([AppRelease].self, from: data)
+        return try AppRelease.decode(data)
     }
 }

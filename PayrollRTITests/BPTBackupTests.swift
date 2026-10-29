@@ -25,7 +25,7 @@ final class BPTBackupTests: XCTestCase {
         // Read before waiting: a large entry would fill the pipe and block unzip forever.
         let output = pipe.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
-        return (process.terminationStatus, String(decoding: output, as: UTF8.self))
+        return (process.terminationStatus, String(bytes: output, encoding: .utf8) ?? "")
     }
 
     func testWritesABackupInBPTsFormat() throws {

@@ -36,7 +36,7 @@ enum Rosetta {
             process.standardOutput = output
             process.standardError = output
             try process.run()
-            let text = String(decoding: output.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+            let text = String(bytes: output.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
             process.waitUntilExit()
             guard process.terminationStatus == 0, status() == .installed else {
                 let detail = text.trimmingCharacters(in: .whitespacesAndNewlines)

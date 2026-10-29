@@ -27,7 +27,8 @@ final class BPTDatabaseTests: XCTestCase {
             """
         XCTAssertEqual(sqlite3_exec(handle, schema, nil, nil, nil), SQLITE_OK)
         for (app, migration) in applied {
-            let insert = "INSERT INTO south_migrationhistory (app_name, migration, applied) "
+            let insert =
+                "INSERT INTO south_migrationhistory (app_name, migration, applied) "
                 + "VALUES ('\(app)', '\(migration)', '2026-01-01')"
             XCTAssertEqual(sqlite3_exec(handle, insert, nil, nil, nil), SQLITE_OK)
         }
@@ -87,16 +88,16 @@ final class BPTDatabaseTests: XCTestCase {
             "bptrti/0001_initial", "employee_nvr_r26/0001_initial", "bptrti_pct_r25/0001_initial",
         ]
         let v25 = try XCTUnwrap(BPTVersion("25.1.25092.226"))
-        let v26_0 = try XCTUnwrap(BPTVersion("26.0.26069.145147"))
-        let v26_1 = try XCTUnwrap(BPTVersion("26.1.26134.173934"))
+        let v26dot0 = try XCTUnwrap(BPTVersion("26.0.26069.145147"))
+        let v26dot1 = try XCTUnwrap(BPTVersion("26.1.26134.173934"))
         let v27 = try XCTUnwrap(BPTVersion("27.0.27100.1"))
 
         guard case .tooOld = DatabaseCompatibility.check(applied: applied, candidate: v25, newestStarted: nil) else {
             return XCTFail("25.x can't open data that has 2026 apps")
         }
-        XCTAssertEqual(DatabaseCompatibility.check(applied: applied, candidate: v26_1, newestStarted: nil), .current)
-        XCTAssertEqual(DatabaseCompatibility.check(applied: applied, candidate: v27, newestStarted: v26_1), .current)
-        let within = DatabaseCompatibility.check(applied: applied, candidate: v26_0, newestStarted: v26_1)
+        XCTAssertEqual(DatabaseCompatibility.check(applied: applied, candidate: v26dot1, newestStarted: nil), .current)
+        XCTAssertEqual(DatabaseCompatibility.check(applied: applied, candidate: v27, newestStarted: v26dot1), .current)
+        let within = DatabaseCompatibility.check(applied: applied, candidate: v26dot0, newestStarted: v26dot1)
         guard case .tooOld = within else {
             return XCTFail("within a year, the version we last started decides")
         }

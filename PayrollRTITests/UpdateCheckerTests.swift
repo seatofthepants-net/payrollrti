@@ -63,10 +63,10 @@ final class UpdateCheckerTests: XCTestCase {
         XCTAssertEqual(checker.release?.linuxBuild, true)
     }
 
-    func testStartsFromTheEarliestMajorWhenNothingIsInstalled() async {
+    func testStartsFromTheEarliestMajorWhenNothingIsInstalled() async throws {
         let checker = checker(feeds: [26: "26.1.26134.173934"])
         await checker.check(installed: nil)
-        XCTAssertEqual(checker.status, .latestKnown(BPTVersion("26.1.26134.173934")!))
+        XCTAssertEqual(checker.status, .latestKnown(try XCTUnwrap(BPTVersion("26.1.26134.173934"))))
     }
 
     func testFallsBackToTheDownloadPageWithoutFeeds() async {

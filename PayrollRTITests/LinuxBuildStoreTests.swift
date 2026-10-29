@@ -55,12 +55,12 @@ final class LinuxBuildStoreTests: XCTestCase {
     func testMissingModulesIgnoresSharedLibrariesAndKnownModules() throws {
         let runtime = LinuxBuildRuntime(directory: temp)
         try """
-            # comment
-            _ssl
-            Ft.Xml.cDomlettec
-            reportlab.lib._rl_accel
+        # comment
+        _ssl
+        Ft.Xml.cDomlettec
+        reportlab.lib._rl_accel
 
-            """.write(to: temp.appendingPathComponent("manifest.txt"), atomically: true, encoding: .utf8)
+        """.write(to: temp.appendingPathComponent("manifest.txt"), atomically: true, encoding: .utf8)
         let extensions = [
             "libpython2.7.so.1.0", "libcrypto.so.1.1", "libz-a147dcb0.so.1.2.3",
             "_ssl.so", "Ft.Xml.cDomlettec.so", "reportlab.lib._rl_accel.so",

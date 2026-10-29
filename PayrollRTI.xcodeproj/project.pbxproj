@@ -50,8 +50,10 @@
 		E1C92AD92A29684F69B8D16D /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC02B6D2F1E56E18909E5F5D /* MainView.swift */; };
 		E42003211DA3914135CE11C6 /* xz.squashfs in Resources */ = {isa = PBXBuildFile; fileRef = 113740A2ABF8579905A67E4F /* xz.squashfs */; };
 		EBAE64ACB59CB09431080BF1 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D126CF5729F50C52E391907 /* AppSettings.swift */; };
+		EF12907AAFF0D1BDA5D30CF1 /* SquashFSReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9189AB4EB6F7E287BA876F41 /* SquashFSReader.swift */; };
 		EFBDFC04BCD6CB32C98786EE /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C47E44E459B04ED47BA175 /* AppCommands.swift */; };
 		F40130152EF3AB139D109354 /* BPTVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03C083BED45BBCCE425CC8A /* BPTVersionTests.swift */; };
+		F836595DC0C91E7AEF87B618 /* EngineChoiceStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0763ABC4740FA482F0F37D80 /* EngineChoiceStyle.swift */; };
 		F947B23B5D8AB3A5B5ABCB08 /* AppUpdateViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E127B04A89911A2425CCA3 /* AppUpdateViews.swift */; };
 /* End PBXBuildFile section */
 
@@ -68,6 +70,7 @@
 /* Begin PBXFileReference section */
 		023987E94768AD70FF229A3D /* BPTBackupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTBackupTests.swift; sourceTree = "<group>"; };
 		04ED92349ABDEC4C788E1149 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0763ABC4740FA482F0F37D80 /* EngineChoiceStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineChoiceStyle.swift; sourceTree = "<group>"; };
 		09C7DA9CA3D35F5639114DAB /* StatusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenu.swift; sourceTree = "<group>"; };
 		0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTInstallationTests.swift; sourceTree = "<group>"; };
 		0EB0AF0F059352C64275D0D5 /* BPTBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTBackup.swift; sourceTree = "<group>"; };
@@ -90,6 +93,7 @@
 		83F5C99A09B283C859CD7375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8BACBCA757461E22D86B6CE8 /* prefixed.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = prefixed.zip; sourceTree = "<group>"; };
 		8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
+		9189AB4EB6F7E287BA876F41 /* SquashFSReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquashFSReader.swift; sourceTree = "<group>"; };
 		91ADEAEE9E98B5814DE73DC4 /* ServerController+Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ServerController+Support.swift"; sourceTree = "<group>"; };
 		93ADF2F63450920656A3320D /* BPTUpdatesStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTUpdatesStatus.swift; sourceTree = "<group>"; };
 		9489846AEEA115B86F7DB02B /* EngineChoiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineChoiceView.swift; sourceTree = "<group>"; };
@@ -157,6 +161,7 @@
 			children = (
 				33E127B04A89911A2425CCA3 /* AppUpdateViews.swift */,
 				93ADF2F63450920656A3320D /* BPTUpdatesStatus.swift */,
+				0763ABC4740FA482F0F37D80 /* EngineChoiceStyle.swift */,
 				9489846AEEA115B86F7DB02B /* EngineChoiceView.swift */,
 				9B0939A9A93CA2BABE6ECD4A /* LinuxBuildViews.swift */,
 				CC02B6D2F1E56E18909E5F5D /* MainView.swift */,
@@ -200,6 +205,7 @@
 				BEEA6950FB96FACDC04F5D52 /* LinuxBuild.swift */,
 				E32F6019C2DA83F315518BCC /* Rosetta.swift */,
 				A73497F1FCEE390DD6703C60 /* SquashFS.swift */,
+				9189AB4EB6F7E287BA876F41 /* SquashFSReader.swift */,
 				A803E9554C109718E67A7573 /* UpdateChecker.swift */,
 			);
 			path = Model;
@@ -426,6 +432,7 @@
 				8C13DFC625454F0C75726621 /* ChildProcess.swift in Sources */,
 				C19F9D521B64656F85E85173 /* DebugSnapshot.swift in Sources */,
 				6F9666B3004240E581B3F47A /* Download.swift in Sources */,
+				F836595DC0C91E7AEF87B618 /* EngineChoiceStyle.swift in Sources */,
 				0FC2D354AF8E3D27F8B34154 /* EngineChoiceView.swift in Sources */,
 				9B7A7CC1487CF870D6D4F44F /* ExternalServer.swift in Sources */,
 				184DCF4B5D4908528678998A /* LinuxBuild.swift in Sources */,
@@ -437,6 +444,7 @@
 				384497DF8C5833ED203AEF59 /* ServerController.swift in Sources */,
 				AB4A8743D4EE35C31EF44B1E /* SettingsView.swift in Sources */,
 				6F0ABDD0042BB3807E36FB6A /* SquashFS.swift in Sources */,
+				EF12907AAFF0D1BDA5D30CF1 /* SquashFSReader.swift in Sources */,
 				679DCD969529478E767F05AE /* StatusMenu.swift in Sources */,
 				7E046AC4B773821B5FB1D1AA /* UpdateChecker.swift in Sources */,
 				8ECAC56BADFBEDC330F5C287 /* WebViewCoordinator.swift in Sources */,

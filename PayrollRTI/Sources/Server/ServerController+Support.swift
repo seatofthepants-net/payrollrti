@@ -21,6 +21,48 @@ extension ServerController {
         }
     }
 
+    enum DatabaseGuard: Equatable {
+        case ok
+        /// This copy can't open the database; the message says why.
+        case refused(String)
+        case backupFailed(String)
+    }
+
+    /// Both engines share the database. A newer BPT migrates it forward; an older one can't go back, and its
+    /// migration tool would abort part-way through startup, so refuse before it touches anything. The database's
+    /// own migration history is the authority; the version we last started is the fallback. When a migration is
+    /// coming, a backup BPT can restore is taken first.
+    func guardDatabase(for installation: BPTInstallation) -> DatabaseGuard {
+        let database = BPTDatabase(url: dataDirectory.appendingPathComponent("sqlite3.db"))
+        let compatibility = installation.databaseCompatibility(with: database)
+        var refusal: String?
+        if case .tooOld(let detail) = compatibility {
+            refusal = detail
+        } else if case .unknown = compatibility, let version = installation.version,
+            let newest = AppSettings.newestStartedVersion, version < newest
+        {
+            refusal = "Your payroll database has already been used by version \(newest); this is \(version)."
+        }
+        if let refusal {
+            return .refused(
+                "This copy of Basic PAYE Tools can't open your payroll data. \(refusal) Basic PAYE Tools can't go "
+                    + "back to an older version: switch to the other engine in PayrollRTI Settings, or install a "
+                    + "newer version of this one.")
+        }
+        if case .upgrade(let pending) = compatibility {
+            do {
+                let backup = try BPTBackup.write(
+                    database: database.url, version: AppSettings.newestStartedVersion, reason: "PRE-UPGRADE",
+                    to: dataDirectory.appendingPathComponent("backups"))
+                appendLog("--- database needs \(pending) migration(s); backed up to \(backup.lastPathComponent)")
+            } catch {
+                return .backupFailed(
+                    "Couldn't back up your payroll data before updating it: \(error.localizedDescription)")
+            }
+        }
+        return .ok
+    }
+
     func appendLog(_ line: String) {
         guard let handle = try? FileHandle(forWritingTo: logURL) else { return }
         defer { try? handle.close() }

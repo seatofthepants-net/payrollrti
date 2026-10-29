@@ -11,9 +11,13 @@ struct AppUpdateBanner: View {
                 Text("PayrollRTI \(release.version?.description ?? release.tagName) is available.")
                 Button("What's new and install…") { updater.showsDetails = true }.fontWeight(.semibold)
                 Spacer()
-                Button(action: { updater.isBannerDismissed = true }) { Image(systemName: "xmark") }
-                    .buttonStyle(.borderless)
-                    .help("Dismiss")
+                Button {
+                    updater.isBannerDismissed = true
+                } label: {
+                    Image(systemName: "xmark")
+                }
+                .buttonStyle(.borderless)
+                .help("Dismiss")
             }
             .font(.callout)
             .padding(.horizontal, 14)
@@ -43,12 +47,14 @@ struct AppUpdateSheet: View {
                 .frame(minHeight: 160, maxHeight: 320)
                 .padding(12)
                 .background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 8))
-                Link("View on GitHub", destination: release.htmlURL).font(.callout)
+                Link("View on GitHub", destination: release.htmlUrl).font(.callout)
                 Divider()
                 actions
             } else {
                 Text("PayrollRTI is up to date.").font(.title3)
-                HStack { Spacer(); Button("Close") { dismiss() }.keyboardShortcut(.cancelAction) }
+                HStack {
+                    Spacer(); Button("Close") { dismiss() }.keyboardShortcut(.cancelAction)
+                }
             }
         }
         .padding(24)
@@ -107,8 +113,9 @@ struct AppUpdateSheet: View {
         let text = body?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         guard !text.isEmpty else { return AttributedString("No release notes.") }
         let cleaned = text.replacingOccurrences(of: #"^#+\s*"#, with: "", options: .regularExpression)
-        return (try? AttributedString(
-            markdown: cleaned, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+        return
+            (try? AttributedString(
+                markdown: cleaned, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
             ?? AttributedString(text)
     }
 }

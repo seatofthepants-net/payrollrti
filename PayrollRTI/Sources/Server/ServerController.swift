@@ -183,39 +183,17 @@ final class ServerController: ObservableObject {
         try prepareLog(installation: installation, port: port)
         moveEmptyDatabaseAside()
 
-        // Both engines share the database. A newer BPT migrates it forward; an older one can't go back, and
-        // its migration tool would abort part-way through startup, so refuse before it touches anything.
-        // The database's own migration history is the authority; the version we last started is the fallback.
-        let database = BPTDatabase(url: dataDirectory.appendingPathComponent("sqlite3.db"))
-        let compatibility = installation.databaseCompatibility(with: database)
-        var refusal: String?
-        if case .tooOld(let detail) = compatibility {
-            refusal = detail
-        } else if case .unknown = compatibility, let version = installation.version,
-            let newest = AppSettings.newestStartedVersion, version < newest
-        {
-            refusal = "Your payroll database has already been used by version \(newest); this is \(version)."
-        }
-        if let refusal {
+        progress = "Checking the payroll database…"
+        switch guardDatabase(for: installation) {
+        case .ok:
+            break
+        case .refused(let message):
             progress = nil
-            state = .failed(
-                "This copy of Basic PAYE Tools can't open your payroll data. \(refusal) Basic PAYE Tools can't go "
-                    + "back to an older version: switch to the other engine in PayrollRTI Settings, or install a "
-                    + "newer version of this one.")
+            state = .failed(message)
             return false
-        }
-        if case .upgrade(let pending) = compatibility {
-            // startdb will migrate the schema; keep a copy BPT can restore in case that goes wrong.
-            progress = "Backing up payroll data before Basic PAYE Tools updates it…"
-            do {
-                let backup = try BPTBackup.write(
-                    database: database.url, version: AppSettings.newestStartedVersion, reason: "PRE-UPGRADE",
-                    to: dataDirectory.appendingPathComponent("backups"))
-                appendLog("--- database needs \(pending) migration(s); backed up to \(backup.lastPathComponent)")
-            } catch {
-                fail("Couldn't back up your payroll data before updating it: \(error.localizedDescription)")
-                return false
-            }
+        case .backupFailed(let message):
+            fail(message)
+            return false
         }
 
         progress = "Preparing the payroll database…"

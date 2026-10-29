@@ -10,7 +10,7 @@ final class AppUpdaterTests: XCTestCase {
         let ordered = try [
             "0.1.0", "0.2.0-beta.1", "0.2.0-beta.2", "0.2.0-beta.10", "0.2.0-rc.1", "0.2.0", "0.2.1", "1.0.0",
         ]
-            .map(version)
+        .map(version)
         for (earlier, later) in zip(ordered, ordered.dropFirst()) {
             XCTAssertLessThan(earlier, later, "\(earlier) < \(later)")
         }
@@ -26,13 +26,14 @@ final class AppUpdaterTests: XCTestCase {
         var assets: [AppRelease.Asset] = []
         if dmg {
             assets = [
-                .init(name: "PayrollRTI-\(tag.dropFirst()).dmg", browserDownloadURL: URL(string: "https://x/d")!),
-                .init(name: "PayrollRTI-\(tag.dropFirst()).dmg.sha256", browserDownloadURL: URL(string: "https://x/s")!),
+                .init(name: "PayrollRTI-\(tag.dropFirst()).dmg", browserDownloadUrl: URL(string: "https://x/d")!),
+                .init(
+                    name: "PayrollRTI-\(tag.dropFirst()).dmg.sha256", browserDownloadUrl: URL(string: "https://x/s")!),
             ]
         }
         return AppRelease(
             tagName: tag, name: nil, body: "notes", prerelease: prerelease, draft: draft,
-            htmlURL: URL(string: "https://github.com/x")!, assets: assets)
+            htmlUrl: URL(string: "https://github.com/x")!, assets: assets)
     }
 
     func testReleaseBuildsOnlySeeReleases() throws {
@@ -65,7 +66,7 @@ final class AppUpdaterTests: XCTestCase {
                         {"name":"PayrollRTI-0.2.0-beta.1.dmg.sha256",
                          "browser_download_url":"https://example.com/a.sha256"}]}]
             """
-        let releases = try JSONDecoder().decode([AppRelease].self, from: Data(json.utf8))
+        let releases = try AppRelease.decode(Data(json.utf8))
         XCTAssertEqual(releases.first?.dmg?.name, "PayrollRTI-0.2.0-beta.1.dmg")
         XCTAssertEqual(releases.first?.checksum?.name, "PayrollRTI-0.2.0-beta.1.dmg.sha256")
         XCTAssertEqual(releases.first?.version, try version("0.2.0-beta.1"))

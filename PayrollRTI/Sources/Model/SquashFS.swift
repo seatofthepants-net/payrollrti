@@ -1,4 +1,3 @@
-import Compression
 import Foundation
 
 /// Read-only access to a squashfs 4.0 image embedded in a larger file (an AppImage). Gzip compression only.
@@ -26,20 +25,20 @@ struct SquashFSImage {
         case corrupt(String)
     }
 
-    private let reader: Reader
-    private let superblock: Superblock
+    private let reader: SquashFSReader
+    private let superblock: SquashFSSuperblock
 
     init(fileURL: URL, offset: UInt64) throws {
-        reader = try Reader(fileURL: fileURL, base: offset)
-        let raw = try reader.readRaw(at: 0, count: Superblock.size)
-        guard raw.count == Superblock.size, raw.le(UInt32.self, at: 0) == Superblock.magic else {
+        reader = try SquashFSReader(fileURL: fileURL, base: offset)
+        let raw = try reader.readRaw(at: 0, count: SquashFSSuperblock.size)
+        guard raw.count == SquashFSSuperblock.size, raw.le(UInt32.self, at: 0) == SquashFSSuperblock.magic else {
             throw Error.notSquashFS
         }
-        superblock = Superblock(raw)
+        superblock = SquashFSSuperblock(raw)
         guard superblock.versionMajor == 4, superblock.versionMinor == 0 else {
             throw Error.unsupportedVersion(major: superblock.versionMajor, minor: superblock.versionMinor)
         }
-        guard superblock.compressionID == Superblock.gzip else {
+        guard superblock.compressionID == SquashFSSuperblock.gzip else {
             throw Error.unsupportedCompression(superblock.compressionID)
         }
         guard superblock.blockLog < 32, superblock.blockSize == 1 << superblock.blockLog else {
@@ -74,10 +73,10 @@ struct SquashFSImage {
             let expected = Int(min(blockSize, remaining))
             let block = try reader.dataBlock(at: position, sizeWord: sizeWord, expected: expected)
             try output.write(contentsOf: block)
-            position += UInt64(sizeWord & Reader.dataSizeMask)
+            position += UInt64(sizeWord & SquashFSReader.dataSizeMask)
             remaining -= UInt64(expected)
         }
-        if file.fragment != Inode.noFragment {
+        if file.fragment != SquashFSInode.noFragment {
             let location = try fragmentLocation(file.fragment)
             let fragment = try reader.fragmentBlock(at: location.start, sizeWord: location.sizeWord)
             let start = Int(file.fragmentOffset)
@@ -93,7 +92,7 @@ struct SquashFSImage {
 
     // MARK: - Walking
 
-    private func walk(directory: Inode, path: String, _ visit: (Entry) throws -> Void) throws {
+    private func walk(directory: SquashFSInode, path: String, _ visit: (Entry) throws -> Void) throws {
         for child in try listing(of: directory) {
             let node = try inode(at: child.inodeRef)
             let childPath = path.isEmpty ? child.name : path + "/" + child.name
@@ -111,7 +110,7 @@ struct SquashFSImage {
         }
     }
 
-    private func lookup(_ path: String) throws -> Inode {
+    private func lookup(_ path: String) throws -> SquashFSInode {
         var node = try inode(at: superblock.rootInodeRef)
         for component in path.split(separator: "/") {
             guard case .directory = node.body,
@@ -129,8 +128,19 @@ struct SquashFSImage {
         let inodeRef: UInt64
     }
 
-    private func inode(at reference: UInt64) throws -> Inode {
-        var cursor = try MetadataCursor(
+    /// Inode type codes: basic/extended directory, file, symlink; everything else (devices, fifos, sockets) is skipped.
+    private enum InodeType {
+        static let directory: UInt16 = 1
+        static let file: UInt16 = 2
+        static let symlink: UInt16 = 3
+        static let extendedDirectory: UInt16 = 8
+        static let extendedFile: UInt16 = 9
+        static let extendedSymlink: UInt16 = 10
+        static let other: Set<UInt16> = [4, 5, 6, 7, 11, 12, 13, 14]
+    }
+
+    private func inode(at reference: UInt64) throws -> SquashFSInode {
+        var cursor = try SquashFSMetadataCursor(
             reader: reader, block: superblock.inodeTableStart + (reference >> 16), offset: Int(reference & 0xFFFF))
         let type = try cursor.readU16()
         let mode = try cursor.readU16()
@@ -138,62 +148,81 @@ struct SquashFSImage {
         _ = try cursor.readU16()  // gid
         _ = try cursor.readU32()  // mtime
         _ = try cursor.readU32()  // inode number
-        let body: Inode.Body
+        let body: SquashFSInode.Body
         switch type {
-        case 1:
-            let startBlock = try cursor.readU32()
-            _ = try cursor.readU32()  // nlink
-            let fileSize = try cursor.readU16()
-            let blockOffset = try cursor.readU16()
-            body = .directory(
-                Inode.Directory(startBlock: startBlock, blockOffset: blockOffset, listingSize: UInt32(fileSize)))
-        case 8:
-            _ = try cursor.readU32()  // nlink
-            let fileSize = try cursor.readU32()
-            let startBlock = try cursor.readU32()
-            _ = try cursor.readU32()  // parent inode
-            _ = try cursor.readU16()  // index count
-            let blockOffset = try cursor.readU16()
-            body = .directory(Inode.Directory(startBlock: startBlock, blockOffset: blockOffset, listingSize: fileSize))
-        case 2:
-            let startBlock = try cursor.readU32()
-            let fragment = try cursor.readU32()
-            let fragmentOffset = try cursor.readU32()
-            let size = try cursor.readU32()
-            body = .file(
-                try fileBody(
-                    &cursor, startBlock: UInt64(startBlock), size: UInt64(size), fragment: fragment,
-                    fragmentOffset: fragmentOffset))
-        case 9:
-            let startBlock = try cursor.readU64()
-            let size = try cursor.readU64()
-            _ = try cursor.readU64()  // sparse
-            _ = try cursor.readU32()  // nlink
-            let fragment = try cursor.readU32()
-            let fragmentOffset = try cursor.readU32()
-            _ = try cursor.readU32()  // xattr
-            body = .file(
-                try fileBody(
-                    &cursor, startBlock: startBlock, size: size, fragment: fragment, fragmentOffset: fragmentOffset))
-        case 3, 10:
-            _ = try cursor.readU32()  // nlink
-            let targetSize = try cursor.readU32()
-            guard targetSize <= 65535 else { throw Error.corrupt("symlink target of \(targetSize) bytes") }
-            let target = try cursor.read(Int(targetSize))
-            body = .symlink(target: String(decoding: target, as: UTF8.self))
-        case 4, 5, 6, 7, 11, 12, 13, 14:
+        case InodeType.directory:
+            body = .directory(try basicDirectory(&cursor))
+        case InodeType.extendedDirectory:
+            body = .directory(try extendedDirectory(&cursor))
+        case InodeType.file:
+            body = .file(try basicFile(&cursor))
+        case InodeType.extendedFile:
+            body = .file(try extendedFile(&cursor))
+        case InodeType.symlink, InodeType.extendedSymlink:
+            body = .symlink(target: try symlinkTarget(&cursor))
+        case let other where InodeType.other.contains(other):
             body = .other
         default:
             throw Error.corrupt("unknown inode type \(type)")
         }
-        return Inode(mode: mode, body: body)
+        return SquashFSInode(mode: mode, body: body)
     }
 
+    private func basicDirectory(_ cursor: inout SquashFSMetadataCursor) throws -> SquashFSInode.Directory {
+        let startBlock = try cursor.readU32()
+        _ = try cursor.readU32()  // nlink
+        let fileSize = try cursor.readU16()
+        let blockOffset = try cursor.readU16()
+        return SquashFSInode.Directory(startBlock: startBlock, blockOffset: blockOffset, listingSize: UInt32(fileSize))
+    }
+
+    private func extendedDirectory(_ cursor: inout SquashFSMetadataCursor) throws -> SquashFSInode.Directory {
+        _ = try cursor.readU32()  // nlink
+        let fileSize = try cursor.readU32()
+        let startBlock = try cursor.readU32()
+        _ = try cursor.readU32()  // parent inode
+        _ = try cursor.readU16()  // index count
+        let blockOffset = try cursor.readU16()
+        return SquashFSInode.Directory(startBlock: startBlock, blockOffset: blockOffset, listingSize: fileSize)
+    }
+
+    private func basicFile(_ cursor: inout SquashFSMetadataCursor) throws -> SquashFSInode.File {
+        let startBlock = try cursor.readU32()
+        let fragment = try cursor.readU32()
+        let fragmentOffset = try cursor.readU32()
+        let size = try cursor.readU32()
+        return try fileBody(
+            &cursor, startBlock: UInt64(startBlock), size: UInt64(size), fragment: fragment,
+            fragmentOffset: fragmentOffset)
+    }
+
+    private func extendedFile(_ cursor: inout SquashFSMetadataCursor) throws -> SquashFSInode.File {
+        let startBlock = try cursor.readU64()
+        let size = try cursor.readU64()
+        _ = try cursor.readU64()  // sparse
+        _ = try cursor.readU32()  // nlink
+        let fragment = try cursor.readU32()
+        let fragmentOffset = try cursor.readU32()
+        _ = try cursor.readU32()  // xattr
+        return try fileBody(
+            &cursor, startBlock: startBlock, size: size, fragment: fragment, fragmentOffset: fragmentOffset)
+    }
+
+    private func symlinkTarget(_ cursor: inout SquashFSMetadataCursor) throws -> String {
+        _ = try cursor.readU32()  // nlink
+        let targetSize = try cursor.readU32()
+        guard targetSize <= 65535 else { throw Error.corrupt("symlink target of \(targetSize) bytes") }
+        return try cursor.readString(Int(targetSize))
+    }
+
+    /// Reads the block size list shared by basic and extended file inodes: one word per full block, plus one for the
+    /// tail block unless the tail lives in a fragment.
     private func fileBody(
-        _ cursor: inout MetadataCursor, startBlock: UInt64, size: UInt64, fragment: UInt32, fragmentOffset: UInt32
-    ) throws -> Inode.File {
+        _ cursor: inout SquashFSMetadataCursor, startBlock: UInt64, size: UInt64, fragment: UInt32,
+        fragmentOffset: UInt32
+    ) throws -> SquashFSInode.File {
         let blockSize = UInt64(superblock.blockSize)
-        let hasFragment = fragment != Inode.noFragment
+        let hasFragment = fragment != SquashFSInode.noFragment
         let blockCount = hasFragment ? size / blockSize : (size + blockSize - 1) / blockSize
         guard blockCount <= 1 << 24 else { throw Error.corrupt("file of \(size) bytes has too many blocks") }
         var blockSizes: [UInt32] = []
@@ -204,16 +233,16 @@ struct SquashFSImage {
         if hasFragment, fragment >= superblock.fragmentCount {
             throw Error.corrupt("fragment \(fragment) out of range")
         }
-        return Inode.File(
+        return SquashFSInode.File(
             startBlock: startBlock, size: size, fragment: fragment, fragmentOffset: fragmentOffset,
             blockSizes: blockSizes)
     }
 
-    private func listing(of node: Inode) throws -> [DirectoryEntry] {
+    private func listing(of node: SquashFSInode) throws -> [DirectoryEntry] {
         guard case let .directory(directory) = node.body else { throw Error.corrupt("not a directory") }
         guard directory.listingSize >= 3 else { return [] }
         let length = Int(directory.listingSize) - 3
-        var cursor = try MetadataCursor(
+        var cursor = try SquashFSMetadataCursor(
             reader: reader, block: superblock.directoryTableStart + UInt64(directory.startBlock),
             offset: Int(directory.blockOffset))
         var entries: [DirectoryEntry] = []
@@ -229,11 +258,9 @@ struct SquashFSImage {
                 _ = try cursor.readU16()  // inode number delta
                 _ = try cursor.readU16()  // type
                 let nameSize = Int(try cursor.readU16()) + 1
-                let name = try cursor.read(nameSize)
+                let name = try cursor.readString(nameSize)
                 consumed += 8 + nameSize
-                entries.append(
-                    DirectoryEntry(
-                        name: String(decoding: name, as: UTF8.self), inodeRef: UInt64(start) << 16 | UInt64(offset)))
+                entries.append(DirectoryEntry(name: name, inodeRef: UInt64(start) << 16 | UInt64(offset)))
             }
         }
         guard consumed == length else { throw Error.corrupt("directory listing overran its size") }
@@ -256,228 +283,5 @@ struct SquashFSImage {
         guard entryOffset + 16 <= block.count else { throw Error.corrupt("truncated fragment table block") }
         return FragmentLocation(
             start: block.le(UInt64.self, at: entryOffset), sizeWord: block.le(UInt32.self, at: entryOffset + 8))
-    }
-
-    // MARK: - On-disk structures
-
-    private struct Superblock {
-        static let size = 96
-        static let magic: UInt32 = 0x7371_7368  // "hsqs"
-        static let gzip: UInt16 = 1
-
-        let blockSize: UInt32
-        let fragmentCount: UInt32
-        let compressionID: UInt16
-        let blockLog: UInt16
-        let versionMajor: UInt16
-        let versionMinor: UInt16
-        let rootInodeRef: UInt64
-        let inodeTableStart: UInt64
-        let directoryTableStart: UInt64
-        let fragmentTableStart: UInt64
-
-        init(_ raw: Data) {
-            blockSize = raw.le(UInt32.self, at: 12)
-            fragmentCount = raw.le(UInt32.self, at: 16)
-            compressionID = raw.le(UInt16.self, at: 20)
-            blockLog = raw.le(UInt16.self, at: 22)
-            versionMajor = raw.le(UInt16.self, at: 28)
-            versionMinor = raw.le(UInt16.self, at: 30)
-            rootInodeRef = raw.le(UInt64.self, at: 32)
-            inodeTableStart = raw.le(UInt64.self, at: 64)
-            directoryTableStart = raw.le(UInt64.self, at: 72)
-            fragmentTableStart = raw.le(UInt64.self, at: 80)
-        }
-    }
-
-    private struct Inode {
-        static let noFragment: UInt32 = 0xFFFF_FFFF
-
-        struct Directory {
-            let startBlock: UInt32
-            let blockOffset: UInt16
-            let listingSize: UInt32
-        }
-
-        struct File {
-            let startBlock: UInt64
-            let size: UInt64
-            let fragment: UInt32
-            let fragmentOffset: UInt32
-            let blockSizes: [UInt32]
-        }
-
-        enum Body {
-            case directory(Directory)
-            case file(File)
-            case symlink(target: String)
-            case other
-        }
-
-        let mode: UInt16
-        let body: Body
-    }
-
-    /// Sequential reader over the metadata block stream starting at a given block, following into the next block
-    /// (which begins right after the current block's compressed bytes) as needed.
-    private struct MetadataCursor {
-        private let reader: Reader
-        private var block: Data
-        private var next: UInt64
-        private var position: Int
-
-        init(reader: Reader, block start: UInt64, offset: Int) throws {
-            self.reader = reader
-            let decoded = try reader.metadataBlock(at: start)
-            block = decoded.data
-            next = decoded.next
-            position = offset
-            guard offset <= block.count else { throw Error.corrupt("metadata offset \(offset) beyond block") }
-        }
-
-        mutating func read(_ count: Int) throws -> Data {
-            var out = Data(capacity: count)
-            while out.count < count {
-                if position == block.count {
-                    let decoded = try reader.metadataBlock(at: next)
-                    guard !decoded.data.isEmpty else { throw Error.corrupt("empty metadata block") }
-                    block = decoded.data
-                    next = decoded.next
-                    position = 0
-                }
-                let chunk = min(count - out.count, block.count - position)
-                out.append(block.subdata(in: position..<position + chunk))
-                position += chunk
-            }
-            return out
-        }
-
-        mutating func readU16() throws -> UInt16 { try read(2).le(UInt16.self, at: 0) }
-        mutating func readU32() throws -> UInt32 { try read(4).le(UInt32.self, at: 0) }
-        mutating func readU64() throws -> UInt64 { try read(8).le(UInt64.self, at: 0) }
-    }
-
-    // MARK: - File access and decompression
-
-    /// Random access to the image file plus caches of decoded metadata and fragment blocks.
-    private final class Reader {
-        static let dataSizeMask: UInt32 = 0x00FF_FFFF
-        static let dataUncompressed: UInt32 = 0x0100_0000
-        static let metadataUncompressed: UInt16 = 0x8000
-        static let metadataSizeMask: UInt16 = 0x7FFF
-        static let metadataBlockSize = 8192
-        private static let fragmentCacheLimit = 64
-
-        struct MetadataBlock {
-            let data: Data
-            let next: UInt64
-        }
-
-        var blockSize = 0
-        private let handle: FileHandle
-        private let base: UInt64
-        private var metadataCache: [UInt64: MetadataBlock] = [:]
-        private var fragmentCache: [UInt64: Data] = [:]
-
-        init(fileURL: URL, base: UInt64) throws {
-            handle = try FileHandle(forReadingFrom: fileURL)
-            self.base = base
-        }
-
-        deinit {
-            try? handle.close()
-        }
-
-        /// Reads up to `count` bytes at an image-relative offset; shorter at end of file.
-        func readRaw(at offset: UInt64, count: Int) throws -> Data {
-            let (absolute, overflow) = base.addingReportingOverflow(offset)
-            guard !overflow, absolute <= UInt64(Int64.max) else { throw Error.corrupt("offset \(offset) overflows") }
-            var data = Data(count: count)
-            var filled = 0
-            while filled < count {
-                let got = data.withUnsafeMutableBytes { buffer -> Int in
-                    guard let bytes = buffer.baseAddress else { return 0 }
-                    return pread(handle.fileDescriptor, bytes + filled, count - filled, off_t(absolute) + off_t(filled))
-                }
-                if got < 0 { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
-                if got == 0 { break }
-                filled += got
-            }
-            data.count = filled
-            return data
-        }
-
-        func metadataBlock(at offset: UInt64) throws -> MetadataBlock {
-            if let cached = metadataCache[offset] { return cached }
-            let header = try readRaw(at: offset, count: 2)
-            guard header.count == 2 else { throw Error.corrupt("truncated metadata block at \(offset)") }
-            let word = header.le(UInt16.self, at: 0)
-            let size = Int(word & Self.metadataSizeMask)
-            let raw = try readRaw(at: offset + 2, count: size)
-            guard raw.count == size else { throw Error.corrupt("truncated metadata block at \(offset)") }
-            let data: Data
-            if word & Self.metadataUncompressed != 0 {
-                data = raw
-            } else {
-                data = try inflate(raw, capacity: Self.metadataBlockSize, context: "metadata block at \(offset)")
-            }
-            let block = MetadataBlock(data: data, next: offset + 2 + UInt64(size))
-            metadataCache[offset] = block
-            return block
-        }
-
-        /// A file data block; `expected` is its decoded length (the block size except for a short final block).
-        func dataBlock(at offset: UInt64, sizeWord: UInt32, expected: Int) throws -> Data {
-            let size = Int(sizeWord & Self.dataSizeMask)
-            if size == 0 { return Data(count: expected) }
-            let data = try decodeBlock(at: offset, size: size, uncompressed: sizeWord & Self.dataUncompressed != 0)
-            guard data.count == expected else {
-                throw Error.corrupt("data block at \(offset) decoded to \(data.count) bytes, expected \(expected)")
-            }
-            return data
-        }
-
-        func fragmentBlock(at offset: UInt64, sizeWord: UInt32) throws -> Data {
-            if let cached = fragmentCache[offset] { return cached }
-            let size = Int(sizeWord & Self.dataSizeMask)
-            guard size > 0 else { throw Error.corrupt("empty fragment block at \(offset)") }
-            let data = try decodeBlock(at: offset, size: size, uncompressed: sizeWord & Self.dataUncompressed != 0)
-            if fragmentCache.count >= Self.fragmentCacheLimit { fragmentCache.removeAll(keepingCapacity: true) }
-            fragmentCache[offset] = data
-            return data
-        }
-
-        private func decodeBlock(at offset: UInt64, size: Int, uncompressed: Bool) throws -> Data {
-            guard size <= blockSize else { throw Error.corrupt("data block at \(offset) larger than block size") }
-            let raw = try readRaw(at: offset, count: size)
-            guard raw.count == size else { throw Error.corrupt("truncated data block at \(offset)") }
-            if uncompressed { return raw }
-            return try inflate(raw, capacity: blockSize, context: "data block at \(offset)")
-        }
-
-        /// Inflates one zlib-wrapped block: skips the 2-byte zlib header and lets the raw DEFLATE decoder stop at the
-        /// end of the stream, ignoring the Adler-32 trailer.
-        private func inflate(_ zlib: Data, capacity: Int, context: String) throws -> Data {
-            guard zlib.count > 2 else { throw Error.corrupt("\(context) is too short to be zlib") }
-            var output = Data(count: capacity)
-            let produced = output.withUnsafeMutableBytes { destination -> Int in
-                zlib.withUnsafeBytes { source -> Int in
-                    guard let dst = destination.baseAddress, let src = source.baseAddress else { return 0 }
-                    return compression_decode_buffer(
-                        dst.assumingMemoryBound(to: UInt8.self), capacity,
-                        src.assumingMemoryBound(to: UInt8.self) + 2, zlib.count - 2, nil, COMPRESSION_ZLIB)
-                }
-            }
-            guard produced > 0 else { throw Error.corrupt("\(context) failed to decompress") }
-            output.count = produced
-            return output
-        }
-    }
-}
-
-extension Data {
-    /// Little-endian fixed-width integer at a byte offset relative to the start of this data.
-    func le<T: FixedWidthInteger>(_: T.Type, at offset: Int) -> T {
-        withUnsafeBytes { T(littleEndian: $0.loadUnaligned(fromByteOffset: offset, as: T.self)) }
     }
 }

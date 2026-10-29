@@ -58,7 +58,8 @@ final class SquashFSTests: XCTestCase {
     func testExtractRejectsNonFiles() throws {
         let image = try SquashFSImage(fileURL: SquashFSFixture.url("sample"), offset: 0)
         XCTAssertThrowsError(
-            try image.extract(.init(path: "dir", kind: .directory, mode: 0o755), to: scratch.appendingPathComponent("x"))
+            try image.extract(
+                .init(path: "dir", kind: .directory, mode: 0o755), to: scratch.appendingPathComponent("x"))
         )
     }
 

@@ -161,38 +161,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task {
             server.refreshInstallation()
             await updates.check(installed: server.installation?.version)
-            let alert = NSAlert()
-            var downloadable: BPTVersion?
-            switch updates.status {
-            case .updateAvailable(let installed, let latest):
-                alert.messageText = "Basic PAYE Tools \(latest) is available"
-                if AppSettings.engine == .linuxBuild {
-                    alert.informativeText =
-                        "You have \(installed). PayrollRTI can download the Linux build of the new version from "
-                        + "GOV.UK and switch to it the next time Basic PAYE Tools starts."
-                } else {
-                    alert.informativeText =
-                        "You have \(installed). Download the new version from GOV.UK and run HMRC's installer. "
-                        + "Quit PayrollRTI first so the installer can replace the running copy."
-                }
-                downloadable = latest
-                alert.addButton(withTitle: "Download")
-                alert.addButton(withTitle: "Later")
-            case .upToDate(let installed):
-                alert.messageText = "Basic PAYE Tools is up to date"
-                alert.informativeText = "You have the latest version, \(installed)."
-            case .latestKnown(let latest):
-                alert.messageText = "The latest Basic PAYE Tools is \(latest)"
-                alert.informativeText = "PayrollRTI couldn't tell which version you have installed."
-                downloadable = latest
-                alert.addButton(withTitle: "Download")
-                alert.addButton(withTitle: "Close")
-            case .failed(let message):
-                alert.messageText = "Couldn't check for updates"
-                alert.informativeText = message
-            case .idle, .checking:
-                return
-            }
+            guard let (alert, downloadable) = bptUpdateAlert() else { return }
             if let release = updates.release {
                 let mac = release.macInstaller == true ? "published" : "not published"
                 let linux = release.linuxBuild == true ? "published" : "not published"
@@ -212,5 +181,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+    }
+
+    /// The alert for the current BPT update status and, when there's something to get, the version to download.
+    private func bptUpdateAlert() -> (NSAlert, BPTVersion?)? {
+        let alert = NSAlert()
+        var downloadable: BPTVersion?
+        switch updates.status {
+        case .updateAvailable(let installed, let latest):
+            alert.messageText = "Basic PAYE Tools \(latest) is available"
+            if AppSettings.engine == .linuxBuild {
+                alert.informativeText =
+                    "You have \(installed). PayrollRTI can download the Linux build of the new version from "
+                    + "GOV.UK and switch to it the next time Basic PAYE Tools starts."
+            } else {
+                alert.informativeText =
+                    "You have \(installed). Download the new version from GOV.UK and run HMRC's installer. "
+                    + "Quit PayrollRTI first so the installer can replace the running copy."
+            }
+            downloadable = latest
+            alert.addButton(withTitle: "Download")
+            alert.addButton(withTitle: "Later")
+        case .upToDate(let installed):
+            alert.messageText = "Basic PAYE Tools is up to date"
+            alert.informativeText = "You have the latest version, \(installed)."
+        case .latestKnown(let latest):
+            alert.messageText = "The latest Basic PAYE Tools is \(latest)"
+            alert.informativeText = "PayrollRTI couldn't tell which version you have installed."
+            downloadable = latest
+            alert.addButton(withTitle: "Download")
+            alert.addButton(withTitle: "Close")
+        case .failed(let message):
+            alert.messageText = "Couldn't check for updates"
+            alert.informativeText = message
+        case .idle, .checking:
+            return nil
+        }
+        return (alert, downloadable)
     }
 }
