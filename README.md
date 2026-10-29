@@ -58,11 +58,16 @@ into `~/Library/Application Support/PayrollRTI/LinuxBuild/`, and runs it on a na
 the app. No Rosetta, nothing from HMRC modified or redistributed, and it uses your existing payroll data in
 `~/HMRC/payetools-rti`.
 
-Choose in **Settings > Basic PAYE Tools engine**. Both engines share the database, so switching between
-engines of the same version is just a restart. A newer version migrates the database forward exactly as
-installing a new release does; PayrollRTI refuses to start an engine older than the version that last used
-the database, because Basic PAYE Tools can't go back. When HMRC release a new version and you're on the Linux
-engine, the update banner downloads it in PayrollRTI.
+Choose in **Settings > Basic PAYE Tools engine**, or on the screen PayrollRTI shows when nothing is set up yet:
+
+![Choosing how PayrollRTI runs Basic PAYE Tools](docs/screenshots/choose-engine.png)
+
+Both engines share the database, so switching between engines of the same version is just a restart. Before
+offering either, PayrollRTI reads the list of database changes your payroll data has had (Basic PAYE Tools
+records every one) and compares it with what that copy of Basic PAYE Tools knows: a newer copy will update
+the database when it starts, exactly as installing a new release does, and an older copy is refused, because
+Basic PAYE Tools can't go back. When HMRC release a new version and you're on the Linux engine, the update
+banner downloads it in PayrollRTI.
 
 The Linux engine needs an Apple silicon Mac and a build of PayrollRTI that includes the runtime (the release
 DMGs do). How it works is in [rehost/README.md](rehost/README.md).

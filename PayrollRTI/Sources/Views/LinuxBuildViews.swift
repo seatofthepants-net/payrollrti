@@ -88,30 +88,3 @@ struct LinuxBuildDownloadControls: View {
         }
     }
 }
-
-/// The main window when the Linux engine is selected and no Linux build has been downloaded.
-struct LinuxBuildNotDownloadedView: View {
-    @EnvironmentObject private var server: ServerController
-    @EnvironmentObject private var updates: UpdateChecker
-    @AppStorage(SettingsKey.engine) private var engine = BPTEngine.macInstaller
-
-    var body: some View {
-        StatusPanel(symbol: "arrow.down.circle", title: "HMRC's Linux build isn't downloaded yet") {
-            VStack(spacing: 20) {
-                Text(
-                    "PayrollRTI is set to run the Linux build of Basic PAYE Tools natively. It downloads the release "
-                        + "from GOV.UK and runs it against your existing payroll data in ~/HMRC/payetools-rti.")
-                LinuxBuildDownloadControls()
-                if BPTInstallation.locate(engine: .macInstaller) != nil {
-                    Button("Use HMRC's Mac installer instead") {
-                        engine = .macInstaller
-                        server.start()
-                    }
-                }
-            }
-        }
-        .task {
-            if case .idle = updates.status { await updates.check(installed: nil) }
-        }
-    }
-}

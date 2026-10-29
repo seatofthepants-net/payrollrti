@@ -21,10 +21,8 @@ struct MainView: View {
 
     @ViewBuilder private var content: some View {
         switch server.state {
-        case .notInstalled where engine == .linuxBuild:
-            LinuxBuildNotDownloadedView()
         case .notInstalled:
-            BPTNotFoundView()
+            EngineChoiceView()
         case .starting:
             StatusPanel(symbol: nil, title: server.progress ?? "Starting Basic PAYE Tools…") {
                 if engine == .macInstaller {
@@ -125,29 +123,6 @@ struct StatusPanel<Detail: View>: View {
         .padding(40)
         .frame(maxWidth: 560)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-struct BPTNotFoundView: View {
-    @EnvironmentObject private var server: ServerController
-
-    var body: some View {
-        StatusPanel(symbol: "shippingbox", title: "Basic PAYE Tools isn't installed") {
-            VStack(spacing: 20) {
-                Text(
-                    "PayrollRTI runs HMRC's free Basic PAYE Tools for you, so it needs to be installed first. "
-                        + "Download it from GOV.UK and run the installer, then come back here.")
-                Text("Expected location: \(BPTInstallation.configuredAppURL.path)")
-                    .font(.caption)
-                    .textSelection(.enabled)
-                HStack {
-                    Button("Download from GOV.UK") { NSWorkspace.shared.open(Links.bptDownload) }
-                        .buttonStyle(.borderedProminent)
-                        .keyboardShortcut(.defaultAction)
-                    Button("Check Again") { server.start() }
-                }
-            }
-        }
     }
 }
 

@@ -185,13 +185,27 @@ final class ServerController: ObservableObject {
 
         // Both engines share the database. A newer BPT migrates it forward; an older one can't go back, and
         // its migration tool would abort part-way through startup, so refuse before it touches anything.
-        if let version = installation.version, let newest = AppSettings.newestStartedVersion, version < newest {
+        // The database's own migration history is the authority; the version we last started is the fallback.
+        let database = BPTDatabase(url: dataDirectory.appendingPathComponent("sqlite3.db"))
+        let compatibility = installation.databaseCompatibility(with: database)
+        var refusal: String?
+        if case .tooOld(let detail) = compatibility {
+            refusal = detail
+        } else if case .unknown = compatibility, let version = installation.version,
+            let newest = AppSettings.newestStartedVersion, version < newest
+        {
+            refusal = "Your payroll database has already been used by version \(newest); this is \(version)."
+        }
+        if let refusal {
             progress = nil
             state = .failed(
-                "This copy of Basic PAYE Tools is version \(version), but your payroll database has already been "
-                    + "used by version \(newest). Basic PAYE Tools can't go back to an older version. Switch to the "
-                    + "other engine in PayrollRTI Settings, or install version \(newest) or later of this one.")
+                "This copy of Basic PAYE Tools can't open your payroll data. \(refusal) Basic PAYE Tools can't go "
+                    + "back to an older version: switch to the other engine in PayrollRTI Settings, or install a "
+                    + "newer version of this one.")
             return false
+        }
+        if case .upgrade(let pending) = compatibility {
+            appendLog("--- database needs \(pending) migration(s); startdb will apply them")
         }
 
         progress = "Preparing the payroll database…"

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		04EDB5738D1ECA302E1936F1 /* ServerControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D791699CA1C5982CA49CDDFC /* ServerControllerTests.swift */; };
+		0FC2D354AF8E3D27F8B34154 /* EngineChoiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9489846AEEA115B86F7DB02B /* EngineChoiceView.swift */; };
 		184DCF4B5D4908528678998A /* LinuxBuild.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEA6950FB96FACDC04F5D52 /* LinuxBuild.swift */; };
 		1E42E30A10AE468523EE44DC /* BPTInstallationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */; };
 		1F857B43AC7E885A8B4CAF62 /* SquashFSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AC073CCA515E1C9382696D /* SquashFSTests.swift */; };
@@ -27,6 +28,7 @@
 		8C13DFC625454F0C75726621 /* ChildProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7375712B887551FBFAC09F08 /* ChildProcess.swift */; };
 		8ECAC56BADFBEDC330F5C287 /* WebViewCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55BFCA6E8FA8B1A154ECF35 /* WebViewCoordinator.swift */; };
 		9B7A7CC1487CF870D6D4F44F /* ExternalServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE58F5B7E6E8836E7FE0B7DB /* ExternalServer.swift */; };
+		A12C80248FA5789FCDAD6685 /* BPTDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2877FD76D21503880D27B2 /* BPTDatabase.swift */; };
 		A7836391BA4E9B54C3ECD78A /* AppImageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E19EBCF1C024996AE318DA /* AppImageTests.swift */; };
 		A7E2E6CE1A969E0F18C103BF /* ServerController+Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91ADEAEE9E98B5814DE73DC4 /* ServerController+Support.swift */; };
 		A9DF80CBEFA00D3F9F896F54 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9087CEC5A3769CEC5EBDDC0 /* AppDelegate.swift */; };
@@ -34,7 +36,9 @@
 		BAFFD57FF3FF82ACC7BB2A43 /* AppImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546DD35AA84F6D89E859586B /* AppImage.swift */; };
 		BE5D691B2F260C52C16BB2AB /* FakeBPT.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A338A8593261A6FDA1F43E /* FakeBPT.swift */; };
 		C19F9D521B64656F85E85173 /* DebugSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A74FB904B4E0D0A262FD261 /* DebugSnapshot.swift */; };
+		C4A8BC8E4FD33C377286C148 /* prefixed.zip in Resources */ = {isa = PBXBuildFile; fileRef = 8BACBCA757461E22D86B6CE8 /* prefixed.zip */; };
 		CB9DABD31116641209B40E81 /* WebViewCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245F1AF014E39A68B5EECC46 /* WebViewCoordinatorTests.swift */; };
+		D5C9F57D3A5AB607B4D69193 /* BPTDatabaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3607EB4A43FCCA7F14624C3C /* BPTDatabaseTests.swift */; };
 		DBA728C95BBE3114AE2CC9BC /* sample.squashfs in Resources */ = {isa = PBXBuildFile; fileRef = B64EF8D99F7C31F074233C5A /* sample.squashfs */; };
 		E1C92AD92A29684F69B8D16D /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC02B6D2F1E56E18909E5F5D /* MainView.swift */; };
 		E42003211DA3914135CE11C6 /* xz.squashfs in Resources */ = {isa = PBXBuildFile; fileRef = 113740A2ABF8579905A67E4F /* xz.squashfs */; };
@@ -63,6 +67,7 @@
 		2A4448CE7B236E63E693379B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2D126CF5729F50C52E391907 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		322E544675710DCD59107013 /* PayrollRTI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PayrollRTI.entitlements; sourceTree = "<group>"; };
+		3607EB4A43FCCA7F14624C3C /* BPTDatabaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTDatabaseTests.swift; sourceTree = "<group>"; };
 		546DD35AA84F6D89E859586B /* AppImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImage.swift; sourceTree = "<group>"; };
 		5B7D8100A93D74F44BCF5583 /* BrowserState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserState.swift; sourceTree = "<group>"; };
 		5BC9921F5F670FD94EE790E4 /* PayrollRTIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayrollRTIApp.swift; sourceTree = "<group>"; };
@@ -70,8 +75,10 @@
 		788FC7AB017826391B3E91AD /* BPTVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTVersion.swift; sourceTree = "<group>"; };
 		7A74FB904B4E0D0A262FD261 /* DebugSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugSnapshot.swift; sourceTree = "<group>"; };
 		83F5C99A09B283C859CD7375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8BACBCA757461E22D86B6CE8 /* prefixed.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = prefixed.zip; sourceTree = "<group>"; };
 		8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
 		91ADEAEE9E98B5814DE73DC4 /* ServerController+Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ServerController+Support.swift"; sourceTree = "<group>"; };
+		9489846AEEA115B86F7DB02B /* EngineChoiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineChoiceView.swift; sourceTree = "<group>"; };
 		9AC6ED1A69493A960CA81AB6 /* PayrollRTI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PayrollRTI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B0939A9A93CA2BABE6ECD4A /* LinuxBuildViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinuxBuildViews.swift; sourceTree = "<group>"; };
 		A047646B0E4528476EB80C3C /* BPTWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTWebView.swift; sourceTree = "<group>"; };
@@ -90,6 +97,7 @@
 		D0C47E44E459B04ED47BA175 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCommands.swift; sourceTree = "<group>"; };
 		D1AC073CCA515E1C9382696D /* SquashFSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquashFSTests.swift; sourceTree = "<group>"; };
 		D791699CA1C5982CA49CDDFC /* ServerControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerControllerTests.swift; sourceTree = "<group>"; };
+		DB2877FD76D21503880D27B2 /* BPTDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTDatabase.swift; sourceTree = "<group>"; };
 		DE58F5B7E6E8836E7FE0B7DB /* ExternalServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalServer.swift; sourceTree = "<group>"; };
 		EBC0157A71D3F0B5CD863DEA /* ServerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -131,6 +139,7 @@
 		785A8569C7ADC92CFF207A88 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9489846AEEA115B86F7DB02B /* EngineChoiceView.swift */,
 				9B0939A9A93CA2BABE6ECD4A /* LinuxBuildViews.swift */,
 				CC02B6D2F1E56E18909E5F5D /* MainView.swift */,
 				2A4448CE7B236E63E693379B /* SettingsView.swift */,
@@ -143,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				B4E19EBCF1C024996AE318DA /* AppImageTests.swift */,
+				3607EB4A43FCCA7F14624C3C /* BPTDatabaseTests.swift */,
 				0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */,
 				C03C083BED45BBCCE425CC8A /* BPTVersionTests.swift */,
 				C1A338A8593261A6FDA1F43E /* FakeBPT.swift */,
@@ -161,6 +171,7 @@
 			children = (
 				546DD35AA84F6D89E859586B /* AppImage.swift */,
 				2D126CF5729F50C52E391907 /* AppSettings.swift */,
+				DB2877FD76D21503880D27B2 /* BPTDatabase.swift */,
 				CDD8F042E183096A54B5E936 /* BPTInstallation.swift */,
 				788FC7AB017826391B3E91AD /* BPTVersion.swift */,
 				BEEA6950FB96FACDC04F5D52 /* LinuxBuild.swift */,
@@ -173,6 +184,7 @@
 		A07BBA3588DD6BAB19A030CC /* Fixtures */ = {
 			isa = PBXGroup;
 			children = (
+				8BACBCA757461E22D86B6CE8 /* prefixed.zip */,
 				B64EF8D99F7C31F074233C5A /* sample.squashfs */,
 				113740A2ABF8579905A67E4F /* xz.squashfs */,
 			);
@@ -312,6 +324,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4A8BC8E4FD33C377286C148 /* prefixed.zip in Resources */,
 				DBA728C95BBE3114AE2CC9BC /* sample.squashfs in Resources */,
 				E42003211DA3914135CE11C6 /* xz.squashfs in Resources */,
 			);
@@ -355,6 +368,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7836391BA4E9B54C3ECD78A /* AppImageTests.swift in Sources */,
+				D5C9F57D3A5AB607B4D69193 /* BPTDatabaseTests.swift in Sources */,
 				1E42E30A10AE468523EE44DC /* BPTInstallationTests.swift in Sources */,
 				F40130152EF3AB139D109354 /* BPTVersionTests.swift in Sources */,
 				BE5D691B2F260C52C16BB2AB /* FakeBPT.swift in Sources */,
@@ -374,12 +388,14 @@
 				A9DF80CBEFA00D3F9F896F54 /* AppDelegate.swift in Sources */,
 				BAFFD57FF3FF82ACC7BB2A43 /* AppImage.swift in Sources */,
 				EBAE64ACB59CB09431080BF1 /* AppSettings.swift in Sources */,
+				A12C80248FA5789FCDAD6685 /* BPTDatabase.swift in Sources */,
 				758B3187837E56B75C922682 /* BPTInstallation.swift in Sources */,
 				3BB1026CAA953271CF899EF0 /* BPTVersion.swift in Sources */,
 				218F9B52D9418F4D581C9ECB /* BPTWebView.swift in Sources */,
 				27CD667327422905797A8476 /* BrowserState.swift in Sources */,
 				8C13DFC625454F0C75726621 /* ChildProcess.swift in Sources */,
 				C19F9D521B64656F85E85173 /* DebugSnapshot.swift in Sources */,
+				0FC2D354AF8E3D27F8B34154 /* EngineChoiceView.swift in Sources */,
 				9B7A7CC1487CF870D6D4F44F /* ExternalServer.swift in Sources */,
 				184DCF4B5D4908528678998A /* LinuxBuild.swift in Sources */,
 				31CD9172820F218375DCBBD0 /* LinuxBuildViews.swift in Sources */,
