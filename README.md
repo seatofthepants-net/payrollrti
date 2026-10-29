@@ -8,6 +8,10 @@
   Run HMRC's Basic PAYE Tools on macOS Sequoia, Tahoe and Golden Gate without the Terminal workaround.
 </p>
 
+<p align="center">
+  <a href="https://payrollrti.uk"><strong>payrollrti.uk</strong></a>: download, install steps and common questions
+</p>
+
 ---
 
 ## The problem
