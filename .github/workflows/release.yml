@@ -113,7 +113,11 @@ jobs:
       - name: Write changelog
         if: github.ref_type == 'tag'
         run: |
-          previous="$(git describe --tags --abbrev=0 --match 'v*.*.*' "${GITHUB_REF_NAME}^" 2>/dev/null || true)"
+          # A release's notes run from the previous release, skipping pre-releases (which may sit on the same
+          # commit); a pre-release's notes run from whatever came last.
+          exclude=()
+          case "$GITHUB_REF_NAME" in *-*) ;; *) exclude=(--exclude 'v*-*') ;; esac
+          previous="$(git describe --tags --abbrev=0 --match 'v*.*.*' "${exclude[@]}" "${GITHUB_REF_NAME}^" 2>/dev/null || true)"
           range="${previous:+$previous..}$GITHUB_REF_NAME"
           {
             echo "## What's changed"

@@ -89,5 +89,3 @@ static tree either).
 ## Not yet done
 
 - An x86_64 slice for Intel Macs, if HMRC drop their Mac build before those Macs leave service.
-- A notarised release with the embedded runtime (the signing step exists in `scripts/embed-linux-runtime.sh`
-  but has only run with the ad-hoc identity so far).
