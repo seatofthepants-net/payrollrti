@@ -1,13 +1,35 @@
 import ServiceManagement
 import SwiftUI
 
+/// Preferences, as three short tabs rather than one long list.
 struct SettingsView: View {
     @EnvironmentObject private var server: ServerController
-    @EnvironmentObject private var appUpdates: AppUpdater
-    @Environment(\.appActions) private var actions
+
+    var body: some View {
+        TabView {
+            GeneralSettings()
+                .tabItem { Label("General", systemImage: "gearshape") }
+            EngineSettings()
+                .tabItem { Label("Engine", systemImage: "bolt") }
+            UpdateSettings()
+                .tabItem { Label("Updates", systemImage: "arrow.down.circle") }
+        }
+        .frame(width: 560)
+        .onAppear { server.refreshInstallation() }
+    }
+
+    static var appVersion: String {
+        let info = Bundle.main.infoDictionary ?? [:]
+        let version = info["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info["CFBundleVersion"] as? String ?? "?"
+        return "\(version) (\(build))"
+    }
+}
+
+private struct GeneralSettings: View {
+    @EnvironmentObject private var server: ServerController
     @AppStorage(SettingsKey.port) private var port = AppSettings.defaultPort
     @AppStorage(SettingsKey.openMode) private var openMode = OpenMode.embedded
-    @AppStorage(SettingsKey.engine) private var engine = BPTEngine.macInstaller
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var loginItemError: String?
 
@@ -44,7 +66,32 @@ struct SettingsView: View {
             } header: {
                 Text("General")
             }
+        }
+        .formStyle(.grouped)
+        .fixedSize(horizontal: false, vertical: true)
+    }
 
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+            loginItemError = nil
+        } catch {
+            loginItemError = "Couldn't change the login item: \(error.localizedDescription)"
+            launchAtLogin = SMAppService.mainApp.status == .enabled
+        }
+    }
+}
+
+private struct EngineSettings: View {
+    @EnvironmentObject private var server: ServerController
+    @AppStorage(SettingsKey.engine) private var engine = BPTEngine.macInstaller
+
+    var body: some View {
+        Form {
             Section {
                 Picker("Run", selection: $engine) {
                     ForEach(BPTEngine.allCases) { Text($0.label).tag($0) }
@@ -92,16 +139,27 @@ struct SettingsView: View {
             } header: {
                 Text("Basic PAYE Tools")
             }
+        }
+        .formStyle(.grouped)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+}
 
+private struct UpdateSettings: View {
+    @EnvironmentObject private var appUpdates: AppUpdater
+    @Environment(\.appActions) private var actions
+
+    var body: some View {
+        Form {
             Section {
                 BPTUpdatesStatus()
             } header: {
-                Text("Basic PAYE Tools updates")
+                Text("Basic PAYE Tools")
             }
 
             Section {
                 HStack {
-                    Text("PayrollRTI \(Self.appVersion)")
+                    Text("PayrollRTI \(SettingsView.appVersion)")
                         .foregroundStyle(.secondary)
                     Spacer()
                     switch appUpdates.status {
@@ -115,32 +173,11 @@ struct SettingsView: View {
                     Link("Releases", destination: Links.releases)
                 }
                 .font(.callout)
+            } header: {
+                Text("PayrollRTI")
             }
         }
         .formStyle(.grouped)
-        .frame(width: 480)
         .fixedSize(horizontal: false, vertical: true)
-        .onAppear { server.refreshInstallation() }
-    }
-
-    private func setLaunchAtLogin(_ enabled: Bool) {
-        do {
-            if enabled {
-                try SMAppService.mainApp.register()
-            } else {
-                try SMAppService.mainApp.unregister()
-            }
-            loginItemError = nil
-        } catch {
-            loginItemError = "Couldn't change the login item: \(error.localizedDescription)"
-            launchAtLogin = SMAppService.mainApp.status == .enabled
-        }
-    }
-
-    static var appVersion: String {
-        let info = Bundle.main.infoDictionary ?? [:]
-        let version = info["CFBundleShortVersionString"] as? String ?? "?"
-        let build = info["CFBundleVersion"] as? String ?? "?"
-        return "\(version) (\(build))"
     }
 }
