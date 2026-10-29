@@ -59,6 +59,12 @@ jobs:
       - name: Install create-dmg
         run: brew install create-dmg
 
+      - name: Build the native runtime for HMRC's Linux build
+        # Embedded by the "Embed Linux build runtime" phase; without it the Linux engine is unavailable in the app.
+        run: |
+          brew install jpeg-turbo
+          sh rehost/build-runtime.sh
+
       - name: Import Developer ID certificate
         run: |
           keychain="$RUNNER_TEMP/signing.keychain-db"
@@ -114,7 +120,11 @@ jobs:
             echo
             git log --no-merges --pretty='- %s (%h)' "$range"
             echo
-            echo "Requires HMRC's free [Basic PAYE Tools](https://www.gov.uk/basic-paye-tools) installed in /Applications."
+            echo "Runs HMRC's free [Basic PAYE Tools](https://www.gov.uk/basic-paye-tools): either their Mac installer in /Applications, or their Linux build, which PayrollRTI downloads and runs natively on Apple silicon."
+            case "$GITHUB_REF_NAME" in *-*)
+              echo
+              echo "**Pre-release for testing.** Your payroll data is backed up before anything changes it, but please keep your own backup too and report problems in the issues." ;;
+            esac
             if [ -n "$previous" ]; then
               echo
               echo "**Full changelog:** https://github.com/${GITHUB_REPOSITORY}/compare/${previous}...${GITHUB_REF_NAME}"
@@ -126,12 +136,15 @@ jobs:
         if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
+        # A tag with a pre-release suffix (v0.2.0-beta.1) is published as a pre-release, so it never shows as Latest.
         run: |
+          prerelease=()
+          case "$GITHUB_REF_NAME" in *-*) prerelease=(--prerelease) ;; esac
           gh release create "$GITHUB_REF_NAME" \
             build/release/PayrollRTI-*.dmg build/release/PayrollRTI-*.dmg.sha256 \
             --title "PayrollRTI ${GITHUB_REF_NAME#v}" \
             --notes-file "$RUNNER_TEMP/notes.md" \
-            --verify-tag
+            --verify-tag "${prerelease[@]}"
 
       - name: Clean up signing material
         if: always()

@@ -23,16 +23,21 @@ enum FakeBPT {
         return text.split(separator: "\n").map(String.init)
     }
 
-    /// Mirrors real BPT: CFBundleShortVersionString is just "26.1"; CFBundleVersion has the full number.
+    /// Mirrors real BPT: CFBundleShortVersionString is just "26.1"; CFBundleVersion has the full number. The `rti`
+    /// goes where HMRC's installer puts it, inside `Contents/Helpers/rti.app`, unless `serverAppOnly`, which
+    /// mimics the relocated server app some Macs end up with.
     static func make(
-        version: String = "26.1.26134.173934", shortVersion: String = "26.1", behaviour: Behaviour = .serve
+        version: String = "26.1.26134.173934", shortVersion: String = "26.1", behaviour: Behaviour = .serve,
+        serverAppOnly: Bool = false
     ) throws -> BPTInstallation {
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("FakeBPT-\(UUID().uuidString)")
-            .appendingPathComponent("Basic PAYE Tools.app")
-        let installation = BPTInstallation(appURL: root)
-        let macOS = installation.workingDirectoryURL
-        try FileManager.default.createDirectory(at: macOS, withIntermediateDirectories: true)
+            .appendingPathComponent(serverAppOnly ? "rti.app" : "Basic PAYE Tools.app")
+        let installation = BPTInstallation.macInstaller(appURL: root)
+        let serverApp = serverAppOnly ? root : root.appendingPathComponent("Contents/Helpers/rti.app")
+        let executable = serverApp.appendingPathComponent("Contents/MacOS/rti")
+        try FileManager.default.createDirectory(
+            at: executable.deletingLastPathComponent(), withIntermediateDirectories: true)
 
         let plist: NSDictionary = [
             "CFBundleShortVersionString": shortVersion, "CFBundleVersion": version,
@@ -62,13 +67,13 @@ enum FakeBPT {
             esac
 
             """
-        try script.write(to: installation.executableURL, atomically: true, encoding: .utf8)
-        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: installation.executableURL.path)
+        try script.write(to: executable, atomically: true, encoding: .utf8)
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: executable.path)
         return installation
     }
 
     static func remove(_ installation: BPTInstallation) {
-        try? FileManager.default.removeItem(at: installation.appURL.deletingLastPathComponent())
+        try? FileManager.default.removeItem(at: installation.location.deletingLastPathComponent())
     }
 
     /// Asks the kernel for an unused TCP port.

@@ -7,6 +7,7 @@ struct AppCommands: Commands {
 
     var body: some Commands {
         CommandGroup(after: .appInfo) {
+            Button("Check for PayrollRTI Updates…") { actions.checkForAppUpdatesInteractively() }
             Button("Check for Basic PAYE Tools Updates…") { actions.checkForUpdatesInteractively() }
         }
 

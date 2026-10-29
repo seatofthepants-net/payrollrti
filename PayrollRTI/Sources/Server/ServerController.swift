@@ -159,7 +159,7 @@ final class ServerController: ObservableObject {
             state = .running
             return
         }
-        if Self.isBPTAppRunning(installation) {
+        if Self.isBPTAppRunning() {
             state = .failed(
                 "The Basic PAYE Tools app is already open. HMRC advise not to run it alongside the server. "
                     + "Quit it (check the crown icon in the menu bar), then try again.")
@@ -170,12 +170,7 @@ final class ServerController: ObservableObject {
             guard try await prepare(installation, port: port), !Task.isCancelled else { return }
             progress = "Starting Basic PAYE Tools…"
             appendLog("--- rti runserver \(port)")
-            let child = try ChildProcess(
-                executable: installation.executableURL,
-                arguments: ["runserver", String(port)],
-                workingDirectory: installation.workingDirectoryURL,
-                logURL: logURL,
-                environment: Self.childEnvironment)
+            let child = try run(installation, ["runserver", String(port)])
             adopt(child)
             await waitUntilServing(child, at: url)
         } catch {
@@ -188,10 +183,25 @@ final class ServerController: ObservableObject {
         try prepareLog(installation: installation, port: port)
         moveEmptyDatabaseAside()
 
+        progress = "Checking the payroll database…"
+        switch guardDatabase(for: installation) {
+        case .ok:
+            break
+        case .refused(let message):
+            progress = nil
+            state = .failed(message)
+            return false
+        case .backupFailed(let message):
+            fail(message)
+            return false
+        }
+
         progress = "Preparing the payroll database…"
         switch try await runMaintenance("startdb", installation: installation) {
         case 0?:
-            break
+            if let version = installation.version, AppSettings.newestStartedVersion.map({ version > $0 }) ?? true {
+                AppSettings.newestStartedVersion = version
+            }
         case nil:
             fail("Basic PAYE Tools took too long to prepare its database.")
             return false
@@ -247,12 +257,7 @@ final class ServerController: ObservableObject {
         _ command: String, installation: BPTInstallation, timeout: TimeInterval? = nil
     ) async throws -> Int32? {
         appendLog("--- rti \(command)")
-        let process = try ChildProcess(
-            executable: installation.executableURL,
-            arguments: [command],
-            workingDirectory: installation.workingDirectoryURL,
-            logURL: logURL,
-            environment: Self.childEnvironment)
+        let process = try run(installation, [command])
         helper = process
         defer { if helper === process { helper = nil } }
         if let code = await process.waitForExit(timeout: timeout ?? maintenanceTimeout) {
@@ -262,6 +267,16 @@ final class ServerController: ObservableObject {
         appendLog("--- rti \(command) timed out; stopping it")
         await process.terminate(grace: terminationGrace)
         return nil
+    }
+
+    private func run(_ installation: BPTInstallation, _ arguments: [String]) throws -> ChildProcess {
+        let command = installation.command(arguments)
+        return try ChildProcess(
+            executable: command.executable,
+            arguments: command.arguments,
+            workingDirectory: command.workingDirectory,
+            logURL: logURL,
+            environment: Self.childEnvironment.merging(command.environment) { _, new in new })
     }
 
     private func childExited(_ exited: ChildProcess, code: Int32) {

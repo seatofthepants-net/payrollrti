@@ -5,24 +5,37 @@ struct MainView: View {
     @EnvironmentObject private var updates: UpdateChecker
     @EnvironmentObject private var browser: BrowserState
     @AppStorage(SettingsKey.openMode) private var openMode = OpenMode.embedded
+    @AppStorage(SettingsKey.engine) private var engine = BPTEngine.macInstaller
+    @EnvironmentObject private var appUpdates: AppUpdater
 
     var body: some View {
         VStack(spacing: 0) {
+            if appUpdates.showsBanner {
+                AppUpdateBanner()
+                Divider()
+            }
             if updates.showsBanner, let latest = updates.availableUpdate {
-                UpdateBanner(version: latest) { updates.isBannerDismissed = true }
+                UpdateBanner(version: latest, downloadsInApp: engine == .linuxBuild) {
+                    updates.isBannerDismissed = true
+                }
                 Divider()
             }
             content
         }
+        .sheet(isPresented: $appUpdates.showsDetails) { AppUpdateSheet().environmentObject(appUpdates) }
     }
 
     @ViewBuilder private var content: some View {
         switch server.state {
         case .notInstalled:
-            BPTNotFoundView()
+            EngineChoiceView()
         case .starting:
             StatusPanel(symbol: nil, title: server.progress ?? "Starting Basic PAYE Tools…") {
-                Text("The first launch on an Apple silicon Mac can take a minute while Rosetta translates it.")
+                if engine == .macInstaller {
+                    Text("The first launch on an Apple silicon Mac can take a minute while Rosetta translates it.")
+                } else {
+                    Text("Basic PAYE Tools is checking its database before it starts.")
+                }
             }
         case .stopping:
             StatusPanel(symbol: nil, title: server.progress ?? "Stopping Basic PAYE Tools…") {
@@ -119,29 +132,6 @@ struct StatusPanel<Detail: View>: View {
     }
 }
 
-struct BPTNotFoundView: View {
-    @EnvironmentObject private var server: ServerController
-
-    var body: some View {
-        StatusPanel(symbol: "shippingbox", title: "Basic PAYE Tools isn't installed") {
-            VStack(spacing: 20) {
-                Text(
-                    "PayrollRTI runs HMRC's free Basic PAYE Tools for you, so it needs to be installed first. "
-                        + "Download it from GOV.UK and run the installer, then come back here.")
-                Text("Expected location: \(BPTInstallation.configuredAppURL.path)")
-                    .font(.caption)
-                    .textSelection(.enabled)
-                HStack {
-                    Button("Download from GOV.UK") { NSWorkspace.shared.open(Links.bptDownload) }
-                        .buttonStyle(.borderedProminent)
-                        .keyboardShortcut(.defaultAction)
-                    Button("Check Again") { server.start() }
-                }
-            }
-        }
-    }
-}
-
 struct StoppedView: View {
     @EnvironmentObject private var server: ServerController
 
@@ -201,13 +191,21 @@ struct BrowserModeView: View {
 
 struct UpdateBanner: View {
     let version: BPTVersion
+    /// With the Linux engine the update is downloaded by PayrollRTI itself; otherwise it's HMRC's installer on GOV.UK.
+    let downloadsInApp: Bool
     let dismiss: () -> Void
+    @EnvironmentObject private var installer: LinuxBuildInstaller
+    @EnvironmentObject private var server: ServerController
 
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "arrow.down.circle.fill").foregroundStyle(.tint)
             Text("A newer version of Basic PAYE Tools (\(version.description)) is available.")
-            Link("Download", destination: Links.bptDownload).fontWeight(.semibold)
+            if downloadsInApp {
+                inAppAction
+            } else {
+                Link("Download", destination: Links.bptDownload).fontWeight(.semibold)
+            }
             Spacer()
             Button(action: dismiss) { Image(systemName: "xmark") }
                 .buttonStyle(.borderless)
@@ -217,5 +215,26 @@ struct UpdateBanner: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
         .background(.bar)
+    }
+
+    @ViewBuilder private var inAppAction: some View {
+        switch installer.phase {
+        case .downloading(let fraction):
+            ProgressView(value: fraction ?? 0).frame(width: 120)
+            Text(fraction.map { "\(Int($0 * 100))%" } ?? "Downloading…").monospacedDigit()
+        case .backingUp:
+            ProgressView().controlSize(.small)
+            Text("Backing up…")
+        case .extracting:
+            ProgressView().controlSize(.small)
+            Text("Unpacking…")
+        case .installed(let installed) where installed == version:
+            Button("Restart to use it") { Task { await server.restart() } }.fontWeight(.semibold)
+        case .idle, .installed, .failed:
+            Button("Download") { Task { await installer.install(version: version) } }.fontWeight(.semibold)
+            if case .failed(let message) = installer.phase {
+                Text(message).foregroundStyle(.red).lineLimit(1).help(message)
+            }
+        }
     }
 }

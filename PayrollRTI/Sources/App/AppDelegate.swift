@@ -7,6 +7,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let server = ServerController()
     let updates = UpdateChecker()
     let browser = BrowserState()
+    let linuxBuild = LinuxBuildInstaller()
+    let appUpdates = AppUpdater()
 
     private var cancellables: Set<AnyCancellable> = []
     private var signalSources: [DispatchSourceSignal] = []
@@ -18,6 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         UserDefaults.standard.register(defaults: [
             SettingsKey.port: AppSettings.defaultPort,
             SettingsKey.openMode: OpenMode.embedded.rawValue,
+            SettingsKey.engine: BPTEngine.macInstaller.rawValue,
         ])
 
         handleTerminationSignals()
@@ -31,11 +34,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             .store(in: &cancellables)
 
+        // A freshly downloaded Linux build is the installation the Linux engine was waiting for.
+        linuxBuild.$phase
+            .sink { [weak self] phase in
+                guard let self, case .installed = phase else { return }
+                server.refreshInstallation()
+                if AppSettings.engine == .linuxBuild, server.canStart { server.start() }
+            }
+            .store(in: &cancellables)
+
         #if DEBUG
             DebugSnapshot.startIfRequested(server: server)
         #endif
         server.start()
         Task { await updates.check(installed: server.installation?.version) }
+        Task { await appUpdates.check() }
     }
 
     /// Closing the window leaves the server running behind the menu-bar icon.
@@ -99,38 +112,111 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    /// Menu-driven check for a new PayrollRTI: opens the notes-and-install sheet, or says it's up to date.
+    func checkForAppUpdatesInteractively() {
+        Task {
+            await appUpdates.check()
+            NSApp.activate(ignoringOtherApps: true)
+            if appUpdates.available != nil {
+                showMainWindow()
+                appUpdates.showsDetails = true
+                return
+            }
+            let alert = NSAlert()
+            if case .failed(let message) = appUpdates.status {
+                alert.messageText = "Couldn't check for PayrollRTI updates"
+                alert.informativeText = message
+            } else {
+                alert.messageText = "PayrollRTI is up to date"
+                alert.informativeText = "You have \(appUpdates.current.description)."
+            }
+            alert.runModal()
+        }
+    }
+
+    private func showMainWindow() {
+        if let window = NSApp.windows.first(where: { $0.title == "Basic PAYE Tools" }) {
+            window.makeKeyAndOrderFront(nil)
+        }
+    }
+
+    /// Installs a staged PayrollRTI update: stop Basic PAYE Tools (with its backup-on-exit, as a normal quit
+    /// does), start the watcher that swaps the bundle once we're gone, and exit. Not `NSApp.terminate`: the
+    /// async shutdown and AppKit's wait for it both need the main queue, and from a button action they deadlock.
+    func installAppUpdate() {
+        Task {
+            await server.stop()
+            do {
+                try appUpdates.launchInstaller()
+            } catch {
+                appUpdates.reportInstallFailure(error.localizedDescription)
+                return
+            }
+            exit(0)
+        }
+    }
+
     /// Menu-driven check: always reports the outcome, unlike the silent check at launch.
     func checkForUpdatesInteractively() {
         Task {
             server.refreshInstallation()
             await updates.check(installed: server.installation?.version)
-            let alert = NSAlert()
-            switch updates.status {
-            case .updateAvailable(let installed, let latest):
-                alert.messageText = "Basic PAYE Tools \(latest) is available"
-                alert.informativeText =
-                    "You have \(installed). Download the new version from GOV.UK and run HMRC's installer. "
-                    + "Quit PayrollRTI first so the installer can replace the running copy."
-                alert.addButton(withTitle: "Download")
-                alert.addButton(withTitle: "Later")
-            case .upToDate(let installed):
-                alert.messageText = "Basic PAYE Tools is up to date"
-                alert.informativeText = "You have the latest version, \(installed)."
-            case .latestKnown(let latest):
-                alert.messageText = "The latest Basic PAYE Tools is \(latest)"
-                alert.informativeText = "PayrollRTI couldn't tell which version you have installed."
-                alert.addButton(withTitle: "Download")
-                alert.addButton(withTitle: "Close")
-            case .failed(let message):
-                alert.messageText = "Couldn't check for updates"
-                alert.informativeText = message
-            case .idle, .checking:
-                return
+            guard let (alert, downloadable) = bptUpdateAlert() else { return }
+            if let release = updates.release {
+                let mac = release.macInstaller == true ? "published" : "not published"
+                let linux = release.linuxBuild == true ? "published" : "not published"
+                alert.informativeText +=
+                    "\n\nHMRC publish for \(release.version): Mac installer \(mac), Linux build \(linux) "
+                    + "(from \(release.source)).\n\n"
+                    + UpdateChecker.advice(
+                        engine: AppSettings.engine, release: release,
+                        linuxEngineAvailable: LinuxBuildRuntime.bundled != nil)
             }
             NSApp.activate(ignoringOtherApps: true)
             if alert.runModal() == .alertFirstButtonReturn, alert.buttons.count > 1 {
-                NSWorkspace.shared.open(Links.bptDownload)
+                if AppSettings.engine == .linuxBuild, let downloadable {
+                    await linuxBuild.install(version: downloadable)
+                } else {
+                    NSWorkspace.shared.open(Links.bptDownload)
+                }
             }
         }
+    }
+
+    /// The alert for the current BPT update status and, when there's something to get, the version to download.
+    private func bptUpdateAlert() -> (NSAlert, BPTVersion?)? {
+        let alert = NSAlert()
+        var downloadable: BPTVersion?
+        switch updates.status {
+        case .updateAvailable(let installed, let latest):
+            alert.messageText = "Basic PAYE Tools \(latest) is available"
+            if AppSettings.engine == .linuxBuild {
+                alert.informativeText =
+                    "You have \(installed). PayrollRTI can download the Linux build of the new version from "
+                    + "GOV.UK and switch to it the next time Basic PAYE Tools starts."
+            } else {
+                alert.informativeText =
+                    "You have \(installed). Download the new version from GOV.UK and run HMRC's installer. "
+                    + "Quit PayrollRTI first so the installer can replace the running copy."
+            }
+            downloadable = latest
+            alert.addButton(withTitle: "Download")
+            alert.addButton(withTitle: "Later")
+        case .upToDate(let installed):
+            alert.messageText = "Basic PAYE Tools is up to date"
+            alert.informativeText = "You have the latest version, \(installed)."
+        case .latestKnown(let latest):
+            alert.messageText = "The latest Basic PAYE Tools is \(latest)"
+            alert.informativeText = "PayrollRTI couldn't tell which version you have installed."
+            downloadable = latest
+            alert.addButton(withTitle: "Download")
+            alert.addButton(withTitle: "Close")
+        case .failed(let message):
+            alert.messageText = "Couldn't check for updates"
+            alert.informativeText = message
+        case .idle, .checking:
+            return nil
+        }
+        return (alert, downloadable)
     }
 }

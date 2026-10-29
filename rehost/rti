@@ -1,0 +1,85 @@
+#!/usr/bin/env python2.7
+"""Run HMRC's Basic PAYE Tools server from the Linux build's bytecode on a native macOS CPython 2.7.
+
+Stands in for cx_Freeze's frozen `rti.linux` executable. The Linux build is a cx_Freeze app: a stub
+executable with a zip of Python 2.7 bytecode appended, the base stdlib modules frozen into the stub,
+and C extension modules laid out flat next to it as dotted filenames (`Ft.Xml.cDomlettec.so`). This
+reproduces that environment with:
+
+  sys.path  = [the zip inside rti.linux, our stdlib Lib, our stdlib lib-dynload]
+  meta_path = a finder that maps `Ft.Xml.cDomlettec` to `<ext dir>/Ft.Xml.cDomlettec.so`
+
+HMRC's bytecode is untouched. Their own `BPT_BASE_PATH` and `APPDATA` environment variables point
+the server at the payload and at a user-data root, so this never has to patch their settings.
+
+Environment:
+  BPT_REHOST_PAYLOAD   required: the extracted `usr/bptserver` directory (rti.linux, sqlite3.db, templates, static)
+  BPT_REHOST_EXT       directory of native extension modules with dotted names; defaults to `ext/` beside this file
+  APPDATA              optional: user-data root. BPT keeps its data in $APPDATA/HMRC/payetools-rti, or
+                       ~/HMRC/payetools-rti when unset, the same place as HMRC's Mac build.
+
+Usage: rti <manage.py command> [args]   e.g.  rti startdb,  rti runserver 46729
+"""
+import imp
+import os
+import sys
+
+
+class DottedExtensionFinder(object):
+    """cx_Freeze's layout: `pkg.sub.ext` lives at `<dir>/pkg.sub.ext.so`, found ahead of the package's own path."""
+
+    def __init__(self, directory):
+        self.directory = directory
+
+    def find_module(self, fullname, path=None):
+        candidate = os.path.join(self.directory, fullname + '.so')
+        if os.path.isfile(candidate):
+            return DottedExtensionLoader(candidate)
+        return None
+
+
+class DottedExtensionLoader(object):
+    def __init__(self, path):
+        self.path = path
+
+    def load_module(self, fullname):
+        if fullname in sys.modules:
+            return sys.modules[fullname]
+        return imp.load_dynamic(fullname, self.path)
+
+
+def require(name):
+    value = os.environ.get(name)
+    if not value:
+        sys.stderr.write('rti: %s is not set\n' % name)
+        sys.exit(64)
+    return value
+
+
+def main():
+    payload = require('BPT_REHOST_PAYLOAD')
+    here = os.path.dirname(os.path.abspath(__file__))
+    ext_dir = os.environ.get('BPT_REHOST_EXT') or os.path.join(here, 'ext')
+
+    zip_path = os.path.join(payload, 'rti.linux')
+    if not os.path.isfile(zip_path):
+        sys.stderr.write('rti: no rti.linux in %s\n' % payload)
+        sys.exit(66)
+
+    stdlib = os.path.dirname(os.__file__)
+    sys.path = [zip_path, stdlib, os.path.join(stdlib, 'lib-dynload')]
+    sys.meta_path.insert(0, DottedExtensionFinder(ext_dir))
+    sys.frozen = True
+    sys.dont_write_bytecode = True
+
+    # settings_central derives BASE_PATH from sys.argv[0] unless BPT_BASE_PATH is set; set both.
+    os.environ['BPT_BASE_PATH'] = payload
+    sys.argv[0] = os.path.join(payload, 'rti')
+
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
+    from django.core.management import execute_from_command_line
+    execute_from_command_line(sys.argv)
+
+
+if __name__ == '__main__':
+    main()

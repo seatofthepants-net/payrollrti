@@ -1,0 +1,14 @@
+--- 4Suite-XML-1.0.2/Ft/Lib/DistExt/Dist.py	2006-10-20 20:54:38.000000000 +0100
++++ ../4Suite-XML-1.0.2/Ft/Lib/DistExt/Dist.py	2026-10-29 14:42:12.734938431 +0000
+@@ -653,7 +653,10 @@
+         if not isinstance(value, list):
+             value = [ v.strip() for v in value.split(',') ]
+         for v in value:
+-            Version.SplitComparison(v)
++            try:
++                Version.SplitComparison(v)
++            except ValueError:
++                pass
+         self.requires_python = value
+ 
+     def get_requires_external(self):

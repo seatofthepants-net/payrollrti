@@ -49,6 +49,29 @@ PayrollRTI runs the copy in your Applications folder. Your payroll data stays wh
 
 PayrollRTI is an independent open-source project. It isn't made or endorsed by HMRC.
 
+## Two ways to run it: HMRC's Mac installer or their Linux build
+
+HMRC's Mac build is Intel-only, so on Apple silicon it runs under Rosetta, which Apple are withdrawing after
+macOS 27. PayrollRTI can instead run **HMRC's Linux build of the same release**: the same Python program and
+the same database format in a different wrapper. PayrollRTI downloads it from GOV.UK (about 190 MB), unpacks it
+into `~/Library/Application Support/PayrollRTI/LinuxBuild/`, and runs it on a native Python runtime built into
+the app. No Rosetta, nothing from HMRC modified or redistributed, and it uses your existing payroll data in
+`~/HMRC/payetools-rti`.
+
+Choose in **Settings > Basic PAYE Tools engine**, or on the screen PayrollRTI shows when nothing is set up yet:
+
+![Choosing how PayrollRTI runs Basic PAYE Tools](docs/screenshots/choose-engine.png)
+
+Both engines share the database, so switching between engines of the same version is just a restart. Before
+offering either, PayrollRTI reads the list of database changes your payroll data has had (Basic PAYE Tools
+records every one) and compares it with what that copy of Basic PAYE Tools knows: a newer copy will update
+the database when it starts, exactly as installing a new release does, and an older copy is refused, because
+Basic PAYE Tools can't go back. When HMRC release a new version and you're on the Linux engine, the update
+banner downloads it in PayrollRTI.
+
+The Linux engine needs an Apple silicon Mac and a build of PayrollRTI that includes the runtime (the release
+DMGs do). How it works is in [rehost/README.md](rehost/README.md).
+
 ## Screenshots
 
 ![PayrollRTI showing HMRC's Basic PAYE Tools home page](docs/screenshots/running.png)
@@ -92,18 +115,21 @@ get the window back. **Quit PayrollRTI** (⌘Q) stops the server.
 |---|---|---|
 | Port | 46729 | The port HMRC's workaround uses. Change it only if something else is using 46729. |
 | Open Basic PAYE Tools | In the PayrollRTI window | Or in your default web browser. |
+| Basic PAYE Tools engine | HMRC's Mac installer | Or HMRC's Linux build, run natively. See above. |
 | Open PayrollRTI at login | Off | Starts PayrollRTI (and BPT) when you log in. |
-
-The **Server** menu has Start, Stop, Restart, Open in Safari, Open in Default Browser and Show Server Log.
 
 ## Troubleshooting
 
 These mirror HMRC's [service availability and issues](https://www.gov.uk/government/publications/basic-paye-tools-service-availability-and-issues/basic-paye-service-availability-and-issues)
 page, plus a few that are specific to PayrollRTI.
 
-**"Basic PAYE Tools isn't installed".** PayrollRTI looks for
-`/Applications/Basic PAYE Tools.app/Contents/Helpers/rti.app/Contents/MacOS/rti`. Install or reinstall BPT from
-[GOV.UK](https://www.gov.uk/basic-paye-tools), then click **Check Again**. Don't uninstall an existing copy: HMRC
+**"Basic PAYE Tools isn't installed".** PayrollRTI looks for HMRC's `rti` program in `/Applications/Basic PAYE
+Tools.app`, then in `/Applications/HMRC/payetools-rti/rti.app`, then wherever macOS has registered either of HMRC's
+bundles. HMRC's package contains two apps, Basic PAYE Tools and the `rti.app` server inside it, and macOS's installer
+puts a bundle wherever an older copy with the same identifier already was, so on a Mac that had an earlier BPT the
+server can end up alone at `/Applications/HMRC/payetools-rti/rti.app` (and HMRC's own Terminal instructions then fail
+with "No such file or directory"). PayrollRTI runs it from there. If yours is somewhere else again, click
+**Choose…** and pick either app; **Settings** has the same button. Don't uninstall an existing copy to reinstall: HMRC
 warn you'll lose payroll data.
 
 **HMRC's Terminal workaround fails with `no such table: bptrti_settings`.** On a fresh install, the workaround's
@@ -141,14 +167,26 @@ menu, as HMRC describe.
 and HMRC's [other service issues](https://www.gov.uk/government/collections/hm-revenue-and-customs-service-availability-and-issues).
 For anything else, contact the [online services helpdesk](https://www.gov.uk/hmrc-online-services-helpdesk).
 
-**Updating Basic PAYE Tools.** When a new version is out, PayrollRTI shows a banner with a link to GOV.UK. Quit
-PayrollRTI before running HMRC's installer so it can replace the running copy. The next time you open PayrollRTI,
-BPT updates its database before it starts, and the window says "Preparing the payroll database…" while that happens.
+**Updating Basic PAYE Tools.** PayrollRTI asks HMRC's own update feed (the one Basic PAYE Tools polls) for the
+latest version, falling back to the GOV.UK page, and checks which builds HMRC publish for it. **Settings > Basic
+PAYE Tools updates** shows the result, when it was checked, and what it means for the engine you use; **Server >
+Check for Updates** shows the same in a dialog. When a new version is out, a banner appears. On the Mac
+installer engine it links to GOV.UK: quit PayrollRTI before running HMRC's installer so it can replace the running
+copy. On the Linux engine PayrollRTI downloads the new version itself. Either way, the next time Basic PAYE Tools
+starts it updates its database first, and the window says "Preparing the payroll database…" while that happens.
 
-**Backups.** When you quit, PayrollRTI runs BPT's own backup-on-exit, which follows the backup settings in BPT. Backups
-are saved in `~/HMRC/payetools-rti/backups/`. Updates to PayrollRTI itself are
-listed on the [Releases](https://github.com/seatofthepants-net/payrollrti/releases) page, which is linked from
-Settings.
+**Backups.** When you quit, PayrollRTI runs BPT's own backup-on-exit, which follows the backup settings in BPT.
+PayrollRTI also takes a backup of its own before anything that could change your data: before downloading a
+Linux build (`…_PRE-INSTALL.bak`) and before starting a version that will update the database
+(`…_PRE-UPGRADE.bak`). All are saved in `~/HMRC/payetools-rti/backups/` in BPT's own format, so **Restore your
+data** in Basic PAYE Tools can read any of them.
+
+**Updating PayrollRTI itself.** PayrollRTI checks GitHub's releases when it starts and from **PayrollRTI > Check
+for PayrollRTI Updates…**. A banner offers the new version; **What's new and install…** shows the release notes
+and, on **Download and Install**, downloads the disk image, checks it against the published checksum, stops
+Basic PAYE Tools (running its backup-on-exit as a normal quit does), replaces the app with the new one and opens
+it. The previous version goes to the Trash. A pre-release build is offered later pre-releases; a release build
+is only offered releases.
 
 ## Building from source
 
@@ -167,6 +205,12 @@ regenerated `PayrollRTI.xcodeproj`.
 
 Format and lint with `scripts/format.sh`. It needs `swift format`, included with Swift 6, and SwiftLint
 (`brew install swiftlint`).
+
+The Linux engine's native Python runtime isn't in the repository. Build it once with
+`brew install jpeg-turbo && sh rehost/build-runtime.sh` (about five minutes; output in
+`~/Library/PayrollRTI-Linux/build/LinuxBuildRuntime`, or set `OUT`). The "Embed Linux build runtime" build phase
+copies it into the app from there, or from `LINUX_RUNTIME_DIR`; without it the app still builds and the Linux
+engine shows as unavailable.
 
 ### Testing without Basic PAYE Tools
 
@@ -262,12 +306,16 @@ Or add them under **Settings > Secrets and variables > Actions**:
 
 Delete the local `.p12` and `.p8` copies once they're stored somewhere safe, such as a password manager.
 
-### 4. Cut a release
+### 4. Cut a release, or a pre-release for testers
 
 ```sh
 git tag v0.1.0
 git push origin v0.1.0
 ```
+
+A tag with a suffix, such as `v0.2.0-beta.1`, builds the same signed, notarised DMG but publishes it as a GitHub
+**pre-release**: it gets its own page to send testers, and it never shows as the latest release. Tag from `main`
+after merging, so the changelog lists what testers have.
 
 The workflow fails early with a clear message if any secret is missing. If notarisation is rejected, Apple's log is
 printed in the job output.
