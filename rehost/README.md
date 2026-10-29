@@ -59,8 +59,11 @@ execs the line above, then `open PayrollRTI.app --args -bptAppPath <stand-in> -p
   Employer Payment Record totals rendered, 94 successful submissions listed, submission XML viewable.
 - P60s generated: blank (reportlab) and filled (pyPdf overlay), opened in Preview by HMRC's own
   `open_file` darwin path.
-- Module origins verified: every `.py` from HMRC's zip, every `.so` from `ext/` or our `lib-dynload`;
-  4Suite's XPath compiler (the submission validation path) works.
+- A live NINO Verification Request sent to HMRC's Gateway (`transaction-engine.tax.service.gov.uk`):
+  schematron validation, IRmark, TLS via OpenSSL 1.1.1w, authentication, response polling; status
+  Success after 30 s, correlation ID returned. The submission XML carries the same product string as
+  HMRC's own Mac build (`26.1.26134.173934_OSE`, vendor 9205).
+- Module origins verified: every `.py` from HMRC's zip, every `.so` from `ext/` or our `lib-dynload`.
 
 Behaviour that is identical to HMRC's build and not a re-host defect: the 4Suite catalog warning
 (`Share/default.cat` isn't in their zip either) and the 404 for `static/css/print_min.css` (not in their
@@ -68,9 +71,9 @@ static tree either).
 
 ## Not yet done
 
-- A live submission to the Gateway (needs credentials; TLS stack is OpenSSL 1.1.1w via `_ssl`).
 - A differential test: the same pay run through HMRC's Mac build under Rosetta and through this,
-  diffing the generated FPS XML and database rows.
+  diffing the generated FPS XML and database rows, then the FPS sent from one copy only (a second
+  send would be a duplicate FPS at HMRC).
 - Packaging: a Python.framework inside PayrollRTI.app, a Swift extractor (ELF offset + gzip squashfs,
   zlib only), the `.so`-manifest gate for new HMRC releases, and a `ServerController` backend choice.
 - An x86_64 slice for Intel Macs, if HMRC drop their Mac build before those Macs leave service.
