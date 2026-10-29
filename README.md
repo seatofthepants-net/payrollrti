@@ -306,7 +306,15 @@ Or add them under **Settings > Secrets and variables > Actions**:
 
 Delete the local `.p12` and `.p8` copies once they're stored somewhere safe, such as a password manager.
 
-### 4. Cut a release, or a pre-release for testers
+### 4. Tell the website (optional)
+
+`.github/workflows/notify-site.yml` pings [payrollrti-site](https://github.com/seatofthepants-net/payrollrti-site)
+whenever a release or pre-release is published, so its download pages update at once instead of at the site's
+daily run. It needs a repository secret `SITE_DISPATCH_TOKEN`: a fine-grained personal access token with
+**Contents: read and write** on `seatofthepants-net/payrollrti-site` only (`gh secret set SITE_DISPATCH_TOKEN`).
+Without the secret the step fails harmlessly and the site catches up on its own schedule.
+
+### 5. Cut a release, or a pre-release for testers
 
 ```sh
 git tag v0.1.0

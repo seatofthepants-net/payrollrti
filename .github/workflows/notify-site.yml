@@ -1,0 +1,20 @@
+# Tells the website (seatofthepants-net/payrollrti-site) that a release or pre-release was published, so it
+# refreshes its download pages at once rather than at its daily run. Copied from that repo's
+# extras/payrollrti-notify-site.yml. Needs the repo secret SITE_DISPATCH_TOKEN: a fine-grained token with
+# "Contents: read and write" on seatofthepants-net/payrollrti-site only.
+name: Tell the website about a new release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -fsS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.SITE_DISPATCH_TOKEN }}" \
+            https://api.github.com/repos/seatofthepants-net/payrollrti-site/dispatches \
+            -d '{"event_type":"payrollrti-release"}'
