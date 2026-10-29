@@ -13,7 +13,9 @@
 # Needs: Xcode Command Line Tools, Homebrew openssl@1.1, sqlite, jpeg-turbo, freetype, libxml2 (for lxml).
 set -eu
 
-OUT=${OUT:-"$(cd "$(dirname "$0")/.." && pwd)/build/rehost"}
+# CPython's Makefile can't handle spaces in the prefix, so the default avoids the checkout path.
+OUT=${OUT:-"$HOME/Library/PayrollRTI-Linux/build"}
+case "$OUT" in *" "*) echo "OUT must not contain spaces: $OUT" >&2; exit 2;; esac
 SRC="$OUT/src"
 RUNTIME="$OUT/runtime"
 EXT="$OUT/ext"
