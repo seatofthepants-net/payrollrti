@@ -30,9 +30,10 @@ enum FakeBPT {
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("FakeBPT-\(UUID().uuidString)")
             .appendingPathComponent("Basic PAYE Tools.app")
-        let installation = BPTInstallation(appURL: root)
-        let macOS = installation.workingDirectoryURL
-        try FileManager.default.createDirectory(at: macOS, withIntermediateDirectories: true)
+        let installation = BPTInstallation.macInstaller(appURL: root)
+        let executable = BPTInstallation.macInstallerExecutable(in: root)
+        try FileManager.default.createDirectory(
+            at: executable.deletingLastPathComponent(), withIntermediateDirectories: true)
 
         let plist: NSDictionary = [
             "CFBundleShortVersionString": shortVersion, "CFBundleVersion": version,
@@ -62,13 +63,13 @@ enum FakeBPT {
             esac
 
             """
-        try script.write(to: installation.executableURL, atomically: true, encoding: .utf8)
-        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: installation.executableURL.path)
+        try script.write(to: executable, atomically: true, encoding: .utf8)
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: executable.path)
         return installation
     }
 
     static func remove(_ installation: BPTInstallation) {
-        try? FileManager.default.removeItem(at: installation.appURL.deletingLastPathComponent())
+        try? FileManager.default.removeItem(at: installation.location.deletingLastPathComponent())
     }
 
     /// Asks the kernel for an unused TCP port.

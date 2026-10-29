@@ -12,10 +12,11 @@ reproduces that environment with:
 HMRC's bytecode is untouched. Their own `BPT_BASE_PATH` and `APPDATA` environment variables point
 the server at the payload and at a user-data root, so this never has to patch their settings.
 
-Environment (all required):
-  BPT_REHOST_PAYLOAD   the extracted `usr/bptserver` directory (contains rti.linux, sqlite3.db, templates, static)
-  BPT_REHOST_EXT       directory of arm64 extension modules with dotted names
-  APPDATA              user-data root; BPT keeps its data in $APPDATA/HMRC/payetools-rti
+Environment:
+  BPT_REHOST_PAYLOAD   required: the extracted `usr/bptserver` directory (rti.linux, sqlite3.db, templates, static)
+  BPT_REHOST_EXT       directory of native extension modules with dotted names; defaults to `ext/` beside this file
+  APPDATA              optional: user-data root. BPT keeps its data in $APPDATA/HMRC/payetools-rti, or
+                       ~/HMRC/payetools-rti when unset, the same place as HMRC's Mac build.
 
 Usage: rti <manage.py command> [args]   e.g.  rti startdb,  rti runserver 46729
 """
@@ -57,8 +58,8 @@ def require(name):
 
 def main():
     payload = require('BPT_REHOST_PAYLOAD')
-    ext_dir = require('BPT_REHOST_EXT')
-    require('APPDATA')
+    here = os.path.dirname(os.path.abspath(__file__))
+    ext_dir = os.environ.get('BPT_REHOST_EXT') or os.path.join(here, 'ext')
 
     zip_path = os.path.join(payload, 'rti.linux')
     if not os.path.isfile(zip_path):
@@ -69,6 +70,7 @@ def main():
     sys.path = [zip_path, stdlib, os.path.join(stdlib, 'lib-dynload')]
     sys.meta_path.insert(0, DottedExtensionFinder(ext_dir))
     sys.frozen = True
+    sys.dont_write_bytecode = True
 
     # settings_central derives BASE_PATH from sys.argv[0] unless BPT_BASE_PATH is set; set both.
     os.environ['BPT_BASE_PATH'] = payload

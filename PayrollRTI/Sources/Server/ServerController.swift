@@ -159,7 +159,7 @@ final class ServerController: ObservableObject {
             state = .running
             return
         }
-        if Self.isBPTAppRunning(installation) {
+        if Self.isBPTAppRunning() {
             state = .failed(
                 "The Basic PAYE Tools app is already open. HMRC advise not to run it alongside the server. "
                     + "Quit it (check the crown icon in the menu bar), then try again.")
@@ -170,12 +170,7 @@ final class ServerController: ObservableObject {
             guard try await prepare(installation, port: port), !Task.isCancelled else { return }
             progress = "Starting Basic PAYE Tools…"
             appendLog("--- rti runserver \(port)")
-            let child = try ChildProcess(
-                executable: installation.executableURL,
-                arguments: ["runserver", String(port)],
-                workingDirectory: installation.workingDirectoryURL,
-                logURL: logURL,
-                environment: Self.childEnvironment)
+            let child = try run(installation, ["runserver", String(port)])
             adopt(child)
             await waitUntilServing(child, at: url)
         } catch {
@@ -188,10 +183,23 @@ final class ServerController: ObservableObject {
         try prepareLog(installation: installation, port: port)
         moveEmptyDatabaseAside()
 
+        // Both engines share the database. A newer BPT migrates it forward; an older one can't go back, and
+        // its migration tool would abort part-way through startup, so refuse before it touches anything.
+        if let version = installation.version, let newest = AppSettings.newestStartedVersion, version < newest {
+            progress = nil
+            state = .failed(
+                "This copy of Basic PAYE Tools is version \(version), but your payroll database has already been "
+                    + "used by version \(newest). Basic PAYE Tools can't go back to an older version. Switch to the "
+                    + "other engine in PayrollRTI Settings, or install version \(newest) or later of this one.")
+            return false
+        }
+
         progress = "Preparing the payroll database…"
         switch try await runMaintenance("startdb", installation: installation) {
         case 0?:
-            break
+            if let version = installation.version, AppSettings.newestStartedVersion.map({ version > $0 }) ?? true {
+                AppSettings.newestStartedVersion = version
+            }
         case nil:
             fail("Basic PAYE Tools took too long to prepare its database.")
             return false
@@ -247,12 +255,7 @@ final class ServerController: ObservableObject {
         _ command: String, installation: BPTInstallation, timeout: TimeInterval? = nil
     ) async throws -> Int32? {
         appendLog("--- rti \(command)")
-        let process = try ChildProcess(
-            executable: installation.executableURL,
-            arguments: [command],
-            workingDirectory: installation.workingDirectoryURL,
-            logURL: logURL,
-            environment: Self.childEnvironment)
+        let process = try run(installation, [command])
         helper = process
         defer { if helper === process { helper = nil } }
         if let code = await process.waitForExit(timeout: timeout ?? maintenanceTimeout) {
@@ -262,6 +265,16 @@ final class ServerController: ObservableObject {
         appendLog("--- rti \(command) timed out; stopping it")
         await process.terminate(grace: terminationGrace)
         return nil
+    }
+
+    private func run(_ installation: BPTInstallation, _ arguments: [String]) throws -> ChildProcess {
+        let command = installation.command(arguments)
+        return try ChildProcess(
+            executable: command.executable,
+            arguments: command.arguments,
+            workingDirectory: command.workingDirectory,
+            logURL: logURL,
+            environment: Self.childEnvironment.merging(command.environment) { _, new in new })
     }
 
     private func childExited(_ exited: ChildProcess, code: Int32) {

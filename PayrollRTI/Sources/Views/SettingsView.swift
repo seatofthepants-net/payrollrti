@@ -5,6 +5,7 @@ struct SettingsView: View {
     @EnvironmentObject private var server: ServerController
     @AppStorage(SettingsKey.port) private var port = AppSettings.defaultPort
     @AppStorage(SettingsKey.openMode) private var openMode = OpenMode.embedded
+    @AppStorage(SettingsKey.engine) private var engine = BPTEngine.macInstaller
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var loginItemError: String?
 
@@ -43,8 +44,36 @@ struct SettingsView: View {
             }
 
             Section {
-                LabeledContent("Location", value: server.installation?.appURL.path ?? "Not installed")
+                Picker("Run", selection: $engine) {
+                    ForEach(BPTEngine.allCases) { Text($0.label).tag($0) }
+                }
+                .pickerStyle(.radioGroup)
+                .disabled(LinuxBuildRuntime.bundled == nil)
+                .onChange(of: engine) { _, _ in
+                    // Same data either way: a stopped server just starts the other engine; a running one restarts.
+                    if server.canStart { server.start() }
+                }
+                Text(engine.detail).font(.caption).foregroundStyle(.secondary)
+                if let running = server.installation?.engine, server.isRunning, running != engine {
+                    HStack {
+                        Text("Restart Basic PAYE Tools to switch.").font(.caption)
+                        Button("Restart Now") { Task { await server.restart() } }
+                            .controlSize(.small)
+                    }
+                }
+                if engine == .linuxBuild {
+                    LinuxBuildDownloadControls()
+                }
+            } header: {
+                Text("Basic PAYE Tools engine")
+            }
+
+            Section {
+                LabeledContent("Location", value: server.installation?.location.path ?? "Not installed")
                 LabeledContent("Version", value: server.installation?.version?.description ?? "Unknown")
+                if let newest = AppSettings.newestStartedVersion {
+                    LabeledContent("Payroll database last used by", value: newest.description)
+                }
             } header: {
                 Text("Basic PAYE Tools")
             }

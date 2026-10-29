@@ -8,27 +8,36 @@
 
 /* Begin PBXBuildFile section */
 		04EDB5738D1ECA302E1936F1 /* ServerControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D791699CA1C5982CA49CDDFC /* ServerControllerTests.swift */; };
+		184DCF4B5D4908528678998A /* LinuxBuild.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEA6950FB96FACDC04F5D52 /* LinuxBuild.swift */; };
 		1E42E30A10AE468523EE44DC /* BPTInstallationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */; };
+		1F857B43AC7E885A8B4CAF62 /* SquashFSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AC073CCA515E1C9382696D /* SquashFSTests.swift */; };
 		218F9B52D9418F4D581C9ECB /* BPTWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A047646B0E4528476EB80C3C /* BPTWebView.swift */; };
 		27CD667327422905797A8476 /* BrowserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7D8100A93D74F44BCF5583 /* BrowserState.swift */; };
+		31CD9172820F218375DCBBD0 /* LinuxBuildViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0939A9A93CA2BABE6ECD4A /* LinuxBuildViews.swift */; };
 		384497DF8C5833ED203AEF59 /* ServerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC0157A71D3F0B5CD863DEA /* ServerController.swift */; };
 		3BB1026CAA953271CF899EF0 /* BPTVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788FC7AB017826391B3E91AD /* BPTVersion.swift */; };
 		41BA23F113BC84C5B37DABAA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04ED92349ABDEC4C788E1149 /* Assets.xcassets */; };
 		51F03A85E34603EF0531833B /* UpdateCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */; };
 		679DCD969529478E767F05AE /* StatusMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C7DA9CA3D35F5639114DAB /* StatusMenu.swift */; };
 		6BF86192995E7B1BB474C970 /* PayrollRTIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC9921F5F670FD94EE790E4 /* PayrollRTIApp.swift */; };
+		6F0ABDD0042BB3807E36FB6A /* SquashFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A73497F1FCEE390DD6703C60 /* SquashFS.swift */; };
 		758B3187837E56B75C922682 /* BPTInstallation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD8F042E183096A54B5E936 /* BPTInstallation.swift */; };
 		7E046AC4B773821B5FB1D1AA /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A803E9554C109718E67A7573 /* UpdateChecker.swift */; };
+		88DD74DCC672C2DEB213DA5D /* LinuxBuildStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB968E84F55E9928EC7ACD54 /* LinuxBuildStoreTests.swift */; };
 		8C13DFC625454F0C75726621 /* ChildProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7375712B887551FBFAC09F08 /* ChildProcess.swift */; };
 		8ECAC56BADFBEDC330F5C287 /* WebViewCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55BFCA6E8FA8B1A154ECF35 /* WebViewCoordinator.swift */; };
 		9B7A7CC1487CF870D6D4F44F /* ExternalServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE58F5B7E6E8836E7FE0B7DB /* ExternalServer.swift */; };
+		A7836391BA4E9B54C3ECD78A /* AppImageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E19EBCF1C024996AE318DA /* AppImageTests.swift */; };
 		A7E2E6CE1A969E0F18C103BF /* ServerController+Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91ADEAEE9E98B5814DE73DC4 /* ServerController+Support.swift */; };
 		A9DF80CBEFA00D3F9F896F54 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9087CEC5A3769CEC5EBDDC0 /* AppDelegate.swift */; };
 		AB4A8743D4EE35C31EF44B1E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A4448CE7B236E63E693379B /* SettingsView.swift */; };
+		BAFFD57FF3FF82ACC7BB2A43 /* AppImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546DD35AA84F6D89E859586B /* AppImage.swift */; };
 		BE5D691B2F260C52C16BB2AB /* FakeBPT.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A338A8593261A6FDA1F43E /* FakeBPT.swift */; };
 		C19F9D521B64656F85E85173 /* DebugSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A74FB904B4E0D0A262FD261 /* DebugSnapshot.swift */; };
 		CB9DABD31116641209B40E81 /* WebViewCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245F1AF014E39A68B5EECC46 /* WebViewCoordinatorTests.swift */; };
+		DBA728C95BBE3114AE2CC9BC /* sample.squashfs in Resources */ = {isa = PBXBuildFile; fileRef = B64EF8D99F7C31F074233C5A /* sample.squashfs */; };
 		E1C92AD92A29684F69B8D16D /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC02B6D2F1E56E18909E5F5D /* MainView.swift */; };
+		E42003211DA3914135CE11C6 /* xz.squashfs in Resources */ = {isa = PBXBuildFile; fileRef = 113740A2ABF8579905A67E4F /* xz.squashfs */; };
 		EBAE64ACB59CB09431080BF1 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D126CF5729F50C52E391907 /* AppSettings.swift */; };
 		EFBDFC04BCD6CB32C98786EE /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C47E44E459B04ED47BA175 /* AppCommands.swift */; };
 		F40130152EF3AB139D109354 /* BPTVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03C083BED45BBCCE425CC8A /* BPTVersionTests.swift */; };
@@ -49,10 +58,12 @@
 		09C7DA9CA3D35F5639114DAB /* StatusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenu.swift; sourceTree = "<group>"; };
 		0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTInstallationTests.swift; sourceTree = "<group>"; };
 		10031A9038A561DB579821C8 /* PayrollRTITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PayrollRTITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		113740A2ABF8579905A67E4F /* xz.squashfs */ = {isa = PBXFileReference; path = xz.squashfs; sourceTree = "<group>"; };
 		245F1AF014E39A68B5EECC46 /* WebViewCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewCoordinatorTests.swift; sourceTree = "<group>"; };
 		2A4448CE7B236E63E693379B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2D126CF5729F50C52E391907 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		322E544675710DCD59107013 /* PayrollRTI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PayrollRTI.entitlements; sourceTree = "<group>"; };
+		546DD35AA84F6D89E859586B /* AppImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImage.swift; sourceTree = "<group>"; };
 		5B7D8100A93D74F44BCF5583 /* BrowserState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserState.swift; sourceTree = "<group>"; };
 		5BC9921F5F670FD94EE790E4 /* PayrollRTIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayrollRTIApp.swift; sourceTree = "<group>"; };
 		7375712B887551FBFAC09F08 /* ChildProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildProcess.swift; sourceTree = "<group>"; };
@@ -62,15 +73,22 @@
 		8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
 		91ADEAEE9E98B5814DE73DC4 /* ServerController+Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ServerController+Support.swift"; sourceTree = "<group>"; };
 		9AC6ED1A69493A960CA81AB6 /* PayrollRTI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PayrollRTI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B0939A9A93CA2BABE6ECD4A /* LinuxBuildViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinuxBuildViews.swift; sourceTree = "<group>"; };
 		A047646B0E4528476EB80C3C /* BPTWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTWebView.swift; sourceTree = "<group>"; };
+		A73497F1FCEE390DD6703C60 /* SquashFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquashFS.swift; sourceTree = "<group>"; };
 		A803E9554C109718E67A7573 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
+		B4E19EBCF1C024996AE318DA /* AppImageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImageTests.swift; sourceTree = "<group>"; };
 		B55BFCA6E8FA8B1A154ECF35 /* WebViewCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewCoordinator.swift; sourceTree = "<group>"; };
+		B64EF8D99F7C31F074233C5A /* sample.squashfs */ = {isa = PBXFileReference; path = sample.squashfs; sourceTree = "<group>"; };
 		B9087CEC5A3769CEC5EBDDC0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		BB968E84F55E9928EC7ACD54 /* LinuxBuildStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinuxBuildStoreTests.swift; sourceTree = "<group>"; };
+		BEEA6950FB96FACDC04F5D52 /* LinuxBuild.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinuxBuild.swift; sourceTree = "<group>"; };
 		C03C083BED45BBCCE425CC8A /* BPTVersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTVersionTests.swift; sourceTree = "<group>"; };
 		C1A338A8593261A6FDA1F43E /* FakeBPT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeBPT.swift; sourceTree = "<group>"; };
 		CC02B6D2F1E56E18909E5F5D /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		CDD8F042E183096A54B5E936 /* BPTInstallation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTInstallation.swift; sourceTree = "<group>"; };
 		D0C47E44E459B04ED47BA175 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCommands.swift; sourceTree = "<group>"; };
+		D1AC073CCA515E1C9382696D /* SquashFSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquashFSTests.swift; sourceTree = "<group>"; };
 		D791699CA1C5982CA49CDDFC /* ServerControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerControllerTests.swift; sourceTree = "<group>"; };
 		DE58F5B7E6E8836E7FE0B7DB /* ExternalServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalServer.swift; sourceTree = "<group>"; };
 		EBC0157A71D3F0B5CD863DEA /* ServerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerController.swift; sourceTree = "<group>"; };
@@ -113,6 +131,7 @@
 		785A8569C7ADC92CFF207A88 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9B0939A9A93CA2BABE6ECD4A /* LinuxBuildViews.swift */,
 				CC02B6D2F1E56E18909E5F5D /* MainView.swift */,
 				2A4448CE7B236E63E693379B /* SettingsView.swift */,
 				09C7DA9CA3D35F5639114DAB /* StatusMenu.swift */,
@@ -123,12 +142,16 @@
 		838AC38E4C17C713DC3B5CFA /* PayrollRTITests */ = {
 			isa = PBXGroup;
 			children = (
+				B4E19EBCF1C024996AE318DA /* AppImageTests.swift */,
 				0E014C9A08C18DF59D11C02D /* BPTInstallationTests.swift */,
 				C03C083BED45BBCCE425CC8A /* BPTVersionTests.swift */,
 				C1A338A8593261A6FDA1F43E /* FakeBPT.swift */,
+				BB968E84F55E9928EC7ACD54 /* LinuxBuildStoreTests.swift */,
 				D791699CA1C5982CA49CDDFC /* ServerControllerTests.swift */,
+				D1AC073CCA515E1C9382696D /* SquashFSTests.swift */,
 				8C2E28A5E695C4043B6DD8C5 /* UpdateCheckerTests.swift */,
 				245F1AF014E39A68B5EECC46 /* WebViewCoordinatorTests.swift */,
+				A07BBA3588DD6BAB19A030CC /* Fixtures */,
 			);
 			path = PayrollRTITests;
 			sourceTree = "<group>";
@@ -136,12 +159,24 @@
 		9EE54CE5D3B40667DDE7934B /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				546DD35AA84F6D89E859586B /* AppImage.swift */,
 				2D126CF5729F50C52E391907 /* AppSettings.swift */,
 				CDD8F042E183096A54B5E936 /* BPTInstallation.swift */,
 				788FC7AB017826391B3E91AD /* BPTVersion.swift */,
+				BEEA6950FB96FACDC04F5D52 /* LinuxBuild.swift */,
+				A73497F1FCEE390DD6703C60 /* SquashFS.swift */,
 				A803E9554C109718E67A7573 /* UpdateChecker.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		A07BBA3588DD6BAB19A030CC /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				B64EF8D99F7C31F074233C5A /* sample.squashfs */,
+				113740A2ABF8579905A67E4F /* xz.squashfs */,
+			);
+			path = Fixtures;
 			sourceTree = "<group>";
 		};
 		BAB2BF267BB49F993C30C692 /* Server */ = {
@@ -201,6 +236,7 @@
 			buildPhases = (
 				20F223A41495327417A5276A /* Sources */,
 				A8404FBD10F1389E8B6E0294 /* Resources */,
+				E073538797DDC82C39658D18 /* Embed Linux build runtime */,
 			);
 			buildRules = (
 			);
@@ -218,6 +254,7 @@
 			buildConfigurationList = 0D2DD0D3CEA1975B8D46973D /* Build configuration list for PBXNativeTarget "PayrollRTITests" */;
 			buildPhases = (
 				19DA411714312ED3710C9FBA /* Sources */,
+				1AC0A28E28EDBE4EFC2DD846 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -271,6 +308,15 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1AC0A28E28EDBE4EFC2DD846 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DBA728C95BBE3114AE2CC9BC /* sample.squashfs in Resources */,
+				E42003211DA3914135CE11C6 /* xz.squashfs in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A8404FBD10F1389E8B6E0294 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -281,15 +327,40 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		E073538797DDC82C39658D18 /* Embed Linux build runtime */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Linux build runtime";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n# Xcode build phase: copies the native runtime for HMRC's Linux build into the app and signs its binaries.\n#\n# The runtime comes from `rehost/build-runtime.sh` (default output ~/Library/PayrollRTI-Linux/build/LinuxBuildRuntime;\n# override with LINUX_RUNTIME_DIR). Without it the app still builds, and the Linux engine shows as unavailable.\n#\n# Nested executables are not covered by Xcode's signing of the app, and notarisation requires every Mach-O to be\n# signed with the same identity and the hardened runtime, so when a real identity is in use each one is signed here.\nset -euo pipefail\n\nsource=\"${LINUX_RUNTIME_DIR:-$HOME/Library/PayrollRTI-Linux/build/LinuxBuildRuntime}\"\ndestination=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/LinuxBuildRuntime\"\n\nif [ ! -x \"$source/bin/python2.7\" ]; then\n  echo \"warning: no Linux build runtime at $source; the Linux engine will be unavailable in this build\"\n  rm -rf \"$destination\"\n  exit 0\nfi\n\nmkdir -p \"$(dirname \"$destination\")\"\nrsync -a --delete \"$source/\" \"$destination/\"\n\nidentity=\"${EXPANDED_CODE_SIGN_IDENTITY:--}\"\nif [ \"$identity\" != \"-\" ]; then\n  echo \"Signing LinuxBuildRuntime binaries with $identity\"\n  find \"$destination\" -type f \\( -name '*.so' -o -path '*/bin/*' \\) -print0 \\\n    | xargs -0 codesign --force --sign \"$identity\" --options runtime --timestamp\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		19DA411714312ED3710C9FBA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7836391BA4E9B54C3ECD78A /* AppImageTests.swift in Sources */,
 				1E42E30A10AE468523EE44DC /* BPTInstallationTests.swift in Sources */,
 				F40130152EF3AB139D109354 /* BPTVersionTests.swift in Sources */,
 				BE5D691B2F260C52C16BB2AB /* FakeBPT.swift in Sources */,
+				88DD74DCC672C2DEB213DA5D /* LinuxBuildStoreTests.swift in Sources */,
 				04EDB5738D1ECA302E1936F1 /* ServerControllerTests.swift in Sources */,
+				1F857B43AC7E885A8B4CAF62 /* SquashFSTests.swift in Sources */,
 				51F03A85E34603EF0531833B /* UpdateCheckerTests.swift in Sources */,
 				CB9DABD31116641209B40E81 /* WebViewCoordinatorTests.swift in Sources */,
 			);
@@ -301,6 +372,7 @@
 			files = (
 				EFBDFC04BCD6CB32C98786EE /* AppCommands.swift in Sources */,
 				A9DF80CBEFA00D3F9F896F54 /* AppDelegate.swift in Sources */,
+				BAFFD57FF3FF82ACC7BB2A43 /* AppImage.swift in Sources */,
 				EBAE64ACB59CB09431080BF1 /* AppSettings.swift in Sources */,
 				758B3187837E56B75C922682 /* BPTInstallation.swift in Sources */,
 				3BB1026CAA953271CF899EF0 /* BPTVersion.swift in Sources */,
@@ -309,11 +381,14 @@
 				8C13DFC625454F0C75726621 /* ChildProcess.swift in Sources */,
 				C19F9D521B64656F85E85173 /* DebugSnapshot.swift in Sources */,
 				9B7A7CC1487CF870D6D4F44F /* ExternalServer.swift in Sources */,
+				184DCF4B5D4908528678998A /* LinuxBuild.swift in Sources */,
+				31CD9172820F218375DCBBD0 /* LinuxBuildViews.swift in Sources */,
 				E1C92AD92A29684F69B8D16D /* MainView.swift in Sources */,
 				6BF86192995E7B1BB474C970 /* PayrollRTIApp.swift in Sources */,
 				A7E2E6CE1A969E0F18C103BF /* ServerController+Support.swift in Sources */,
 				384497DF8C5833ED203AEF59 /* ServerController.swift in Sources */,
 				AB4A8743D4EE35C31EF44B1E /* SettingsView.swift in Sources */,
+				6F0ABDD0042BB3807E36FB6A /* SquashFS.swift in Sources */,
 				679DCD969529478E767F05AE /* StatusMenu.swift in Sources */,
 				7E046AC4B773821B5FB1D1AA /* UpdateChecker.swift in Sources */,
 				8ECAC56BADFBEDC330F5C287 /* WebViewCoordinator.swift in Sources */,

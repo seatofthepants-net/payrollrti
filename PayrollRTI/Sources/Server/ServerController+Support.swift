@@ -39,7 +39,10 @@ extension ServerController {
             fileManager.createFile(atPath: logURL.path, contents: nil)
         }
         let version = installation.version?.description ?? "unknown version"
-        appendLog("\n=== \(Date()) starting \(installation.executableURL.path) on port \(port) (\(version)) ===")
+        let command = installation.command([])
+        appendLog(
+            "\n=== \(Date()) starting \(installation.engine.label) \(command.executable.path) "
+                + "on port \(port) (\(version)) ===")
     }
 
     /// The last few lines of the server log, for error messages.
@@ -48,8 +51,9 @@ extension ServerController {
         return text.split(separator: "\n", omittingEmptySubsequences: true).suffix(lines).joined(separator: "\n")
     }
 
-    static func isBPTAppRunning(_ installation: BPTInstallation) -> Bool {
-        let bptPath = installation.appURL.standardizedFileURL.path
+    /// HMRC's own Basic PAYE Tools app shares the database with whichever engine we run, so it must not be open.
+    static func isBPTAppRunning() -> Bool {
+        let bptPath = BPTInstallation.configuredAppURL.standardizedFileURL.path
         return NSWorkspace.shared.runningApplications.contains {
             $0.bundleURL?.standardizedFileURL.path == bptPath
         }

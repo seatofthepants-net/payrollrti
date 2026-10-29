@@ -35,6 +35,10 @@ targets:
           ENABLE_HARDENED_RUNTIME: YES
           ARCHS: "$(ARCHS_STANDARD)"
           ONLY_ACTIVE_ARCH: NO
+    postBuildScripts:
+      - name: Embed Linux build runtime
+        path: scripts/embed-linux-runtime.sh
+        basedOnDependencyAnalysis: false
   PayrollRTITests:
     type: bundle.unit-test
     platform: macOS

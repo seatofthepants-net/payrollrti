@@ -59,6 +59,12 @@ jobs:
       - name: Install create-dmg
         run: brew install create-dmg
 
+      - name: Build the native runtime for HMRC's Linux build
+        # Embedded by the "Embed Linux build runtime" phase; without it the Linux engine is unavailable in the app.
+        run: |
+          brew install openssl@1.1 jpeg-turbo
+          sh rehost/build-runtime.sh
+
       - name: Import Developer ID certificate
         run: |
           keychain="$RUNNER_TEMP/signing.keychain-db"

@@ -49,6 +49,24 @@ PayrollRTI runs the copy in your Applications folder. Your payroll data stays wh
 
 PayrollRTI is an independent open-source project. It isn't made or endorsed by HMRC.
 
+## Two ways to run it: HMRC's Mac installer or their Linux build
+
+HMRC's Mac build is Intel-only, so on Apple silicon it runs under Rosetta, which Apple are withdrawing after
+macOS 27. PayrollRTI can instead run **HMRC's Linux build of the same release**: the same Python program and
+the same database format in a different wrapper. PayrollRTI downloads it from GOV.UK (about 190 MB), unpacks it
+into `~/Library/Application Support/PayrollRTI/LinuxBuild/`, and runs it on a native Python runtime built into
+the app. No Rosetta, nothing from HMRC modified or redistributed, and it uses your existing payroll data in
+`~/HMRC/payetools-rti`.
+
+Choose in **Settings > Basic PAYE Tools engine**. Both engines share the database, so switching between
+engines of the same version is just a restart. A newer version migrates the database forward exactly as
+installing a new release does; PayrollRTI refuses to start an engine older than the version that last used
+the database, because Basic PAYE Tools can't go back. When HMRC release a new version and you're on the Linux
+engine, the update banner downloads it in PayrollRTI.
+
+The Linux engine needs an Apple silicon Mac and a build of PayrollRTI that includes the runtime (the release
+DMGs do). How it works is in [rehost/README.md](rehost/README.md).
+
 ## Screenshots
 
 ![PayrollRTI showing HMRC's Basic PAYE Tools home page](docs/screenshots/running.png)
@@ -92,9 +110,8 @@ get the window back. **Quit PayrollRTI** (⌘Q) stops the server.
 |---|---|---|
 | Port | 46729 | The port HMRC's workaround uses. Change it only if something else is using 46729. |
 | Open Basic PAYE Tools | In the PayrollRTI window | Or in your default web browser. |
+| Basic PAYE Tools engine | HMRC's Mac installer | Or HMRC's Linux build, run natively. See above. |
 | Open PayrollRTI at login | Off | Starts PayrollRTI (and BPT) when you log in. |
-
-The **Server** menu has Start, Stop, Restart, Open in Safari, Open in Default Browser and Show Server Log.
 
 ## Troubleshooting
 
@@ -167,6 +184,12 @@ regenerated `PayrollRTI.xcodeproj`.
 
 Format and lint with `scripts/format.sh`. It needs `swift format`, included with Swift 6, and SwiftLint
 (`brew install swiftlint`).
+
+The Linux engine's native Python runtime isn't in the repository. Build it once with
+`brew install openssl@1.1 jpeg-turbo && sh rehost/build-runtime.sh` (about five minutes; output in
+`~/Library/PayrollRTI-Linux/build/LinuxBuildRuntime`, or set `OUT`). The "Embed Linux build runtime" build phase
+copies it into the app from there, or from `LINUX_RUNTIME_DIR`; without it the app still builds and the Linux
+engine shows as unavailable.
 
 ### Testing without Basic PAYE Tools
 

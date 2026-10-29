@@ -50,11 +50,11 @@ final class UpdateChecker: ObservableObject {
     }
 
     /// Pulls the latest version out of the GOV.UK page. HMRC state it in prose ("The latest version is …") and in the
-    /// download file names (`payetools-rti-26.1.26134.173934-osx.zip`); either will do.
+    /// download file names (`payetools-rti-26.1.26134.173934-osx.zip`, `…-linux.zip`); any will do.
     nonisolated static func latestVersion(inPage page: String) -> BPTVersion? {
         let patterns = [
             #"latest version is\s+(\d+(?:\.\d+)+)"#,
-            #"payetools-rti-(\d+(?:\.\d+)+)-osx"#,
+            #"payetools-rti-(\d+(?:\.\d+)+)-(?:osx|linux|win)"#,
         ]
         for pattern in patterns {
             guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else { continue }

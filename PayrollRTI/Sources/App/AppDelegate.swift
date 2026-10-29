@@ -7,6 +7,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let server = ServerController()
     let updates = UpdateChecker()
     let browser = BrowserState()
+    let linuxBuild = LinuxBuildInstaller()
 
     private var cancellables: Set<AnyCancellable> = []
     private var signalSources: [DispatchSourceSignal] = []
@@ -18,6 +19,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         UserDefaults.standard.register(defaults: [
             SettingsKey.port: AppSettings.defaultPort,
             SettingsKey.openMode: OpenMode.embedded.rawValue,
+            SettingsKey.engine: BPTEngine.macInstaller.rawValue,
         ])
 
         handleTerminationSignals()
@@ -28,6 +30,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 if state == .running, AppSettings.openMode == .browser {
                     self?.openInDefaultBrowser()
                 }
+            }
+            .store(in: &cancellables)
+
+        // A freshly downloaded Linux build is the installation the Linux engine was waiting for.
+        linuxBuild.$phase
+            .sink { [weak self] phase in
+                guard let self, case .installed = phase else { return }
+                server.refreshInstallation()
+                if AppSettings.engine == .linuxBuild, server.canStart { server.start() }
             }
             .store(in: &cancellables)
 
@@ -105,12 +116,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             server.refreshInstallation()
             await updates.check(installed: server.installation?.version)
             let alert = NSAlert()
+            var downloadable: BPTVersion?
             switch updates.status {
             case .updateAvailable(let installed, let latest):
                 alert.messageText = "Basic PAYE Tools \(latest) is available"
-                alert.informativeText =
-                    "You have \(installed). Download the new version from GOV.UK and run HMRC's installer. "
-                    + "Quit PayrollRTI first so the installer can replace the running copy."
+                if AppSettings.engine == .linuxBuild {
+                    alert.informativeText =
+                        "You have \(installed). PayrollRTI can download the Linux build of the new version from "
+                        + "GOV.UK and switch to it the next time Basic PAYE Tools starts."
+                } else {
+                    alert.informativeText =
+                        "You have \(installed). Download the new version from GOV.UK and run HMRC's installer. "
+                        + "Quit PayrollRTI first so the installer can replace the running copy."
+                }
+                downloadable = latest
                 alert.addButton(withTitle: "Download")
                 alert.addButton(withTitle: "Later")
             case .upToDate(let installed):
@@ -119,6 +138,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             case .latestKnown(let latest):
                 alert.messageText = "The latest Basic PAYE Tools is \(latest)"
                 alert.informativeText = "PayrollRTI couldn't tell which version you have installed."
+                downloadable = latest
                 alert.addButton(withTitle: "Download")
                 alert.addButton(withTitle: "Close")
             case .failed(let message):
@@ -129,7 +149,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             NSApp.activate(ignoringOtherApps: true)
             if alert.runModal() == .alertFirstButtonReturn, alert.buttons.count > 1 {
-                NSWorkspace.shared.open(Links.bptDownload)
+                if AppSettings.engine == .linuxBuild, let downloadable {
+                    await linuxBuild.install(version: downloadable)
+                } else {
+                    NSWorkspace.shared.open(Links.bptDownload)
+                }
             }
         }
     }
