@@ -1,5 +1,7 @@
 # Tells the website (seatofthepants-net/payrollrti-site) that a release or pre-release was published, so it
-# refreshes its download pages at once rather than at its daily run. Copied from that repo's
+# refreshes its download pages at once rather than at its daily run. Only fires for releases published by
+# hand: releases the Release workflow creates don't raise this event (GitHub's loop guard), so that workflow
+# sends the same dispatch itself. Copied from that repo's
 # extras/payrollrti-notify-site.yml. Needs the repo secret SITE_DISPATCH_TOKEN: a fine-grained token with
 # "Contents: read and write" on seatofthepants-net/payrollrti-site only.
 name: Tell the website about a new release

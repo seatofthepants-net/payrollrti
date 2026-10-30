@@ -150,6 +150,25 @@ jobs:
             --notes-file "$RUNNER_TEMP/notes.md" \
             --verify-tag "${prerelease[@]}"
 
+      - name: Tell the website
+        # A release created with the workflow's own token doesn't raise a `release` event for other workflows
+        # (GitHub's loop guard), so notify-site.yml never sees it. Send the same dispatch from here instead;
+        # notify-site.yml still covers releases published by hand.
+        if: github.ref_type == 'tag'
+        continue-on-error: true
+        env:
+          SITE_DISPATCH_TOKEN: ${{ secrets.SITE_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$SITE_DISPATCH_TOKEN" ]; then
+            echo "::notice::SITE_DISPATCH_TOKEN isn't set; the website will pick this release up at its daily run."
+            exit 0
+          fi
+          curl -fsS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $SITE_DISPATCH_TOKEN" \
+            https://api.github.com/repos/seatofthepants-net/payrollrti-site/dispatches \
+            -d '{"event_type":"payrollrti-release"}'
+
       - name: Clean up signing material
         if: always()
         run: |
