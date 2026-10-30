@@ -34,29 +34,38 @@ final class BrowserState: ObservableObject {
 
     var hasWebView: Bool { webView != nil }
 
+    /// The web view the user is looking at. BPT opens payslips, P45s and P60s in pop-up windows, each with its own
+    /// web view; while one of those is the key window, Print, Reload, Back, Forward and Zoom belong to it, not to
+    /// the main window behind it (printing the main one gave a PDF of the Employee Payment Record instead of the
+    /// payslip).
+    var activeWebView: WKWebView? {
+        if let popup = NSApp.keyWindow?.contentView as? WKWebView { return popup }
+        return webView
+    }
+
     func reload() {
         guard !isRestoring else { return }
-        webView?.reload()
+        activeWebView?.reload()
     }
 
     func goBack() {
         guard !isRestoring else { return }
-        webView?.goBack()
+        activeWebView?.goBack()
     }
 
     func goForward() {
         guard !isRestoring else { return }
-        webView?.goForward()
+        activeWebView?.goForward()
     }
 
-    func zoomIn() { webView.map { $0.pageZoom = min($0.pageZoom + 0.1, 3) } }
+    func zoomIn() { activeWebView.map { $0.pageZoom = min($0.pageZoom + 0.1, 3) } }
 
-    func zoomOut() { webView.map { $0.pageZoom = max($0.pageZoom - 0.1, 0.5) } }
+    func zoomOut() { activeWebView.map { $0.pageZoom = max($0.pageZoom - 0.1, 0.5) } }
 
-    func resetZoom() { webView?.pageZoom = 1 }
+    func resetZoom() { activeWebView?.pageZoom = 1 }
 
     func print() {
-        if let webView { Self.print(webView) }
+        if let activeWebView { Self.print(activeWebView) }
     }
 
     /// Shows the standard print sheet, which also offers "Save as PDF". HMRC note BPT can't print directly
