@@ -332,6 +332,14 @@ after merging, so the changelog lists what testers have.
 The workflow fails early with a clear message if any secret is missing. If notarisation is rejected, Apple's log is
 printed in the job output.
 
+## With thanks to Angus Forrest
+
+Running HMRC's Linux version on a Mac started with Angus Forrest's write-up,
+[Run Basic PAYE Tools on MacOS](https://angusforrest.com/posts/reverse-engineering-hmrc-basic-paye-tools). He took
+HMRC's Mac and Linux builds apart and showed that they are the same Python and Django program in different packaging,
+that the Linux build's server runs on its own, and how Basic PAYE Tools finds HMRC's updates. PayrollRTI builds on that
+work to run the Linux version natively on Apple silicon.
+
 ## Contributing
 
 Issues and pull requests are welcome, particularly from people running Basic PAYE Tools on Macs that we haven't
